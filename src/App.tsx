@@ -13,8 +13,11 @@ import { JobPropertyPanel } from '@/components/JobPropertyPanel'
 import { TriggerNode } from '@/components/TriggerNode'
 import { TriggerPropertyPanel } from '@/components/TriggerPropertyPanel'
 import { PasteYamlDialog } from '@/components/PasteYamlDialog'
+import { SourceCodeDialog } from '@/components/SourceCodeDialog'
 import { openWorkflowFromYaml, saveWorkflowToFile } from '@/lib/fileHandling'
+import { serializeWorkflow } from '@/lib/serializeWorkflow'
 import { parseTriggers, triggersToOn } from '@/lib/triggerUtils'
+import { lintWorkflow, type LintError } from '@/lib/workflowLinter'
 import { workflowToFlowNodesEdges } from '@/lib/workflowToFlow'
 import type { Workflow } from '@/types/workflow'
 
@@ -41,13 +44,25 @@ function AppInner() {
   const [selectedJobId, setSelectedJobId] = useState<string | null>(null)
   const [selectedTrigger, setSelectedTrigger] = useState<boolean>(false)
   const [parseErrors, setParseErrors] = useState<string[]>([])
+  const [lintErrors, setLintErrors] = useState<LintError[]>([])
   const [showPasteDialog, setShowPasteDialog] = useState(false)
+  const [showSourceDialog, setShowSourceDialog] = useState(false)
   const fileInputRef = useRef<HTMLInputElement>(null)
   const isUpdatingWorkflowRef = useRef(false)
 
   const { nodes: baseNodes, edges } = useMemo(() => {
     const w = workflow ?? { name: '', on: {}, jobs: {} }
     return workflowToFlowNodesEdges(w)
+  }, [workflow])
+
+  // Lint workflow whenever it changes
+  useEffect(() => {
+    if (workflow) {
+      const errors = lintWorkflow(workflow)
+      setLintErrors(errors)
+    } else {
+      setLintErrors([])
+    }
   }, [workflow])
 
   const nodes = useMemo(() => {
@@ -220,6 +235,10 @@ function AppInner() {
         if (e.key === 'Escape') setShowPasteDialog(false)
         return
       }
+      if (showSourceDialog) {
+        if (e.key === 'Escape') setShowSourceDialog(false)
+        return
+      }
       if (e.key === 'Escape') {
         setSelectedTrigger(false)
         setSelectedJobId(null)
@@ -234,7 +253,7 @@ function AppInner() {
         if (workflow && hasJobs) handleSave()
       }
     },
-    [showPasteDialog, workflow, hasJobs, handleSave]
+    [showPasteDialog, showSourceDialog, workflow, hasJobs, handleSave]
   )
 
   useEffect(() => {
@@ -256,6 +275,20 @@ function AppInner() {
         <PasteYamlDialog
           onClose={() => setShowPasteDialog(false)}
           onLoad={handlePasteLoad}
+        />
+      )}
+      {showSourceDialog && workflow && (
+        <SourceCodeDialog
+          initialYaml={serializeWorkflow(workflow)}
+          onClose={() => setShowSourceDialog(false)}
+          onSave={(w, errors) => {
+            isUpdatingWorkflowRef.current = true
+            setWorkflow(w)
+            setParseErrors(errors)
+            setTimeout(() => {
+              isUpdatingWorkflowRef.current = false
+            }, 100)
+          }}
         />
       )}
       <header className="flex flex-wrap items-center gap-4 border-b border-slate-200 bg-white px-4 py-2 shadow-sm">
@@ -296,6 +329,14 @@ function AppInner() {
           >
             {workflow ? 'Clear' : 'Load sample'}
           </button>
+          <button
+            type="button"
+            onClick={() => setShowSourceDialog(true)}
+            disabled={!workflow}
+            className="rounded border border-slate-300 bg-white px-2 py-1 text-sm text-slate-600 hover:bg-slate-50 disabled:opacity-50"
+          >
+            View source
+          </button>
         </div>
         <div className="h-6 w-px bg-slate-200" aria-hidden />
         <div className="flex items-center gap-2" role="group" aria-label="Editor">
@@ -315,20 +356,49 @@ function AppInner() {
           </button>
         </div>
       </header>
-      {parseErrors.length > 0 && (
+      {(parseErrors.length > 0 || lintErrors.length > 0) && (
         <div
           role="alert"
-          className="flex items-center justify-between gap-4 border-b border-amber-200 bg-amber-50 px-4 py-2 text-sm text-amber-800"
+          className="flex flex-col gap-2 border-b border-amber-200 bg-amber-50 px-4 py-2 text-sm text-amber-800"
         >
-          <span><strong>Validation:</strong> {parseErrors.join(' ')}</span>
-          <button
-            type="button"
-            onClick={() => setParseErrors([])}
-            className="shrink-0 rounded p-1 hover:bg-amber-100"
-            aria-label="Dismiss errors"
-          >
-            ×
-          </button>
+          <div className="flex items-center justify-between">
+            <span>
+              <strong>Validation:</strong>{' '}
+              {parseErrors.length > 0 && `${parseErrors.length} parse error${parseErrors.length !== 1 ? 's' : ''}`}
+              {parseErrors.length > 0 && lintErrors.length > 0 && ' • '}
+              {lintErrors.length > 0 && `${lintErrors.length} lint error${lintErrors.length !== 1 ? 's' : ''}`}
+            </span>
+            <button
+              type="button"
+              onClick={() => {
+                setParseErrors([])
+                setLintErrors([])
+              }}
+              className="shrink-0 rounded p-1 hover:bg-amber-100"
+              aria-label="Dismiss errors"
+            >
+              ×
+            </button>
+          </div>
+          {parseErrors.length > 0 && (
+            <div className="text-xs">
+              <strong>Parse errors:</strong> {parseErrors.join(' • ')}
+            </div>
+          )}
+          {lintErrors.length > 0 && (
+            <div className="space-y-1 text-xs">
+              <strong>Lint errors:</strong>
+              <ul className="ml-4 list-disc space-y-0.5">
+                {lintErrors.map((error, idx) => (
+                  <li key={idx}>
+                    <span className={error.severity === 'error' ? 'font-medium' : ''}>
+                      {error.path && <code className="text-xs">{error.path}:</code>} {error.message}
+                    </span>
+                  </li>
+                ))}
+              </ul>
+            </div>
+          )}
         </div>
       )}
       <main className="flex-1 overflow-hidden flex" role="main" aria-label="Workflow diagram">
