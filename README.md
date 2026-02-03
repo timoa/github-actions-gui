@@ -7,10 +7,14 @@ A visual editor for GitHub Actions workflow files. Open a workflow (YAML), view 
 ## Features
 
 - **Diagram**: Jobs as nodes, edges from `needs` dependencies. Built with [React Flow](https://reactflow.dev/).
+- **Trigger visualization**: Visual trigger nodes showing workflow triggers (push, pull_request, schedule, etc.) with connections to jobs.
+- **Trigger editing**: Edit workflow triggers with a dedicated panel supporting all trigger types and configurations (branches, tags, paths, cron schedules, etc.).
 - **Property panel**: Click a job node to edit name, runs-on, needs, and steps (N8N-style).
+- **Source code preview**: View and edit workflow YAML in a large dialog. Changes apply only when saved.
+- **Workflow linting**: Automatic validation of workflow syntax, trigger names, job dependencies, and circular dependencies with detailed error messages.
 - **Open**: Load from file (`.yml`/`.yaml`) or paste YAML.
 - **Save**: Download the workflow as a YAML file.
-- **Validation**: Parse errors shown in a banner when opening or pasting.
+- **Validation**: Parse errors and lint errors shown in a banner when opening, pasting, or editing workflows.
 
 ## Run
 

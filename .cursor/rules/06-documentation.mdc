@@ -1,0 +1,40 @@
+---
+description: Documentation and maintenance standards
+alwaysApply: true
+---
+
+# Documentation Standards
+
+## README Updates
+
+- **MANDATORY**: Update `README.md` whenever a new feature is added to the application.
+- New features must be documented in the "Features" section with a brief description.
+- Include any new keyboard shortcuts in the "Keyboard shortcuts" section.
+- Update screenshots if the UI changes significantly.
+- Examples of features that require README updates:
+  - New UI components (e.g., trigger nodes, source code dialog)
+  - New functionality (e.g., workflow linting, trigger editing)
+  - New file operations (e.g., export formats, import options)
+  - New validation features
+  - New keyboard shortcuts
+
+## Feature Documentation Format
+
+When documenting a new feature in the README:
+
+1. Add a bullet point in the "Features" section describing what the feature does.
+2. Keep descriptions concise but informative (1-2 sentences).
+3. If the feature introduces new keyboard shortcuts, add them to the "Keyboard shortcuts" section.
+4. If applicable, mention any dependencies or requirements.
+
+## Examples
+
+- ✅ **Trigger editing**: Visual trigger nodes with editable properties panel for configuring workflow triggers (push, pull_request, schedule, etc.).
+- ✅ **Source code preview**: View and edit workflow YAML in a large dialog. Changes apply only when saved.
+- ✅ **Workflow linting**: Automatic validation of workflow syntax, trigger names, job dependencies, and circular dependencies.
+
+## Maintenance
+
+- Keep the README up-to-date with the current state of the application.
+- Remove references to deprecated features.
+- Update version numbers or compatibility notes if relevant.
