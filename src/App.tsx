@@ -61,10 +61,9 @@ function AppInner() {
   const fileInputRef = useRef<HTMLInputElement>(null)
   const isUpdatingWorkflowRef = useRef(false)
 
-  const { nodes: baseNodes, edges } = useMemo(() => {
-    const w = workflow ?? { name: '', on: {}, jobs: {} }
-    return workflowToFlowNodesEdges(w)
-  }, [workflow])
+  // Compute nodes/edges from workflow on every render so trigger node always reflects current config (branches, tags, etc.)
+  const w = workflow ?? { name: '', on: {}, jobs: {} }
+  const { nodes: baseNodes, edges } = workflowToFlowNodesEdges(w)
 
   // Lint workflow whenever it changes
   useEffect(() => {
@@ -494,6 +493,7 @@ function AppInner() {
         <div className="flex-1 relative">
           {hasJobs ? (
             <ReactFlow
+              key={workflow ? `flow-on-${JSON.stringify(workflow.on)}` : 'flow'}
               nodes={nodes}
               edges={edges}
               onSelectionChange={onSelectionChange}
