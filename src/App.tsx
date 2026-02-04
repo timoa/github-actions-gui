@@ -9,6 +9,7 @@ import {
   type OnSelectionChangeFunc,
 } from '@xyflow/react'
 import '@xyflow/react/dist/style.css'
+import { HiCog, HiFolderOpen, HiClipboardCopy, HiSave, HiTrash, HiCode } from 'react-icons/hi'
 import { AddJobNode } from '@/components/AddJobNode'
 import { JobNode } from '@/components/JobNode'
 import { JobPropertyPanel } from '@/components/JobPropertyPanel'
@@ -58,7 +59,9 @@ function AppInner() {
   const [lintErrors, setLintErrors] = useState<LintError[]>([])
   const [showPasteDialog, setShowPasteDialog] = useState(false)
   const [showSourceDialog, setShowSourceDialog] = useState(false)
+  const [isEditingWorkflowName, setIsEditingWorkflowName] = useState(false)
   const fileInputRef = useRef<HTMLInputElement>(null)
+  const workflowNameInputRef = useRef<HTMLInputElement>(null)
   const isUpdatingWorkflowRef = useRef(false)
 
   // Compute nodes/edges from workflow on every render so trigger node always reflects current config (branches, tags, etc.)
@@ -164,6 +167,7 @@ function AppInner() {
     reader.onload = () => {
       const text = String(reader.result ?? '')
       const { workflow: w, errors } = openWorkflowFromYaml(text)
+      setIsEditingWorkflowName(false)
       isUpdatingWorkflowRef.current = true
       setWorkflow(w)
       setParseErrors(errors)
@@ -184,6 +188,7 @@ function AppInner() {
 
   const handlePasteLoad = useCallback((yaml: string) => {
     const { workflow: w, errors } = openWorkflowFromYaml(yaml)
+    setIsEditingWorkflowName(false)
     isUpdatingWorkflowRef.current = true
     setWorkflow(w)
     setParseErrors(errors)
@@ -345,6 +350,38 @@ function AppInner() {
     return () => window.removeEventListener('keydown', handleKeyDown)
   }, [handleKeyDown])
 
+  // Focus workflow name input when editing starts
+  useEffect(() => {
+    if (isEditingWorkflowName && workflowNameInputRef.current) {
+      workflowNameInputRef.current.focus()
+      workflowNameInputRef.current.select()
+    }
+  }, [isEditingWorkflowName])
+
+  const handleWorkflowNameChange = useCallback(
+    (value: string) => {
+      if (!workflow) return
+      isUpdatingWorkflowRef.current = true
+      setWorkflow({ ...workflow, name: value || undefined })
+      setTimeout(() => {
+        isUpdatingWorkflowRef.current = false
+      }, 100)
+    },
+    [workflow]
+  )
+
+  const handleWorkflowNameKeyDown = useCallback(
+    (e: React.KeyboardEvent<HTMLInputElement>) => {
+      if (e.key === 'Enter') {
+        e.currentTarget.blur()
+        setIsEditingWorkflowName(false)
+      } else if (e.key === 'Escape') {
+        setIsEditingWorkflowName(false)
+      }
+    },
+    []
+  )
+
   return (
     <div className="h-full w-full flex flex-col bg-slate-100">
       <input
@@ -366,6 +403,7 @@ function AppInner() {
           initialYaml={serializeWorkflow(workflow)}
           onClose={() => setShowSourceDialog(false)}
           onSave={(w, errors) => {
+            setIsEditingWorkflowName(false)
             isUpdatingWorkflowRef.current = true
             setWorkflow(w)
             setParseErrors(errors)
@@ -376,69 +414,88 @@ function AppInner() {
         />
       )}
       <header className="flex flex-wrap items-center gap-4 border-b border-slate-200 bg-white px-4 py-2 shadow-sm">
-        <div className="flex items-center gap-2">
-          <h1 className="text-lg font-semibold text-slate-800">GitHub Actions GUI</h1>
-          {workflow && (
-            <span className="text-sm text-slate-500">
-              {workflow.name || 'Untitled Workflow'}
-            </span>
+        <div className="flex items-center gap-2 flex-1 min-w-0">
+          {workflow ? (
+            isEditingWorkflowName ? (
+              <input
+                ref={workflowNameInputRef}
+                type="text"
+                value={workflow.name || ''}
+                onChange={(e) => handleWorkflowNameChange(e.target.value)}
+                onBlur={() => setIsEditingWorkflowName(false)}
+                onKeyDown={handleWorkflowNameKeyDown}
+                className="text-lg font-semibold text-slate-800 bg-transparent border-b-2 border-slate-400 focus:border-slate-600 focus:outline-none px-1 -mx-1 min-w-0 flex-1 max-w-md"
+                placeholder="Untitled Workflow"
+              />
+            ) : (
+              <h1
+                className="text-lg font-semibold text-slate-800 cursor-text hover:text-slate-600 transition-colors min-w-0 flex-1"
+                onClick={() => setIsEditingWorkflowName(true)}
+                title="Click to edit workflow name"
+              >
+                {workflow.name || 'Untitled Workflow'}
+              </h1>
+            )
+          ) : (
+            <h1 className="text-lg font-semibold text-slate-400">No workflow loaded</h1>
           )}
         </div>
+        <div className="text-xs text-slate-400 font-medium">GitHub Actions GUI</div>
         <div className="h-6 w-px bg-slate-200" aria-hidden />
         <div className="flex items-center gap-2" role="group" aria-label="File">
           <button
             type="button"
             onClick={() => fileInputRef.current?.click()}
-            className="rounded border border-slate-300 bg-white px-2 py-1 text-sm text-slate-600 hover:bg-slate-50"
+            className="rounded border border-slate-300 bg-white p-2 text-slate-600 hover:bg-slate-50"
+            title="Open file"
+            aria-label="Open file"
           >
-            Open file
+            <HiFolderOpen className="w-5 h-5" />
           </button>
           <button
             type="button"
             onClick={() => setShowPasteDialog(true)}
-            className="rounded border border-slate-300 bg-white px-2 py-1 text-sm text-slate-600 hover:bg-slate-50"
+            className="rounded border border-slate-300 bg-white p-2 text-slate-600 hover:bg-slate-50"
+            title="Paste YAML"
+            aria-label="Paste YAML"
           >
-            Paste YAML
+            <HiClipboardCopy className="w-5 h-5" />
           </button>
           <button
             type="button"
             onClick={handleSave}
             disabled={!workflow || !hasJobs}
-            className="rounded border border-slate-300 bg-white px-2 py-1 text-sm text-slate-600 hover:bg-slate-50 disabled:opacity-50"
+            className="rounded border border-slate-300 bg-white p-2 text-slate-600 hover:bg-slate-50 disabled:opacity-50"
+            title="Save"
+            aria-label="Save"
           >
-            Save
-          </button>
-          <button
-            type="button"
-            onClick={() => setWorkflow(workflow ? null : sampleWorkflow)}
-            className="rounded border border-slate-300 bg-white px-2 py-1 text-sm text-slate-600 hover:bg-slate-50"
-          >
-            {workflow ? 'Clear' : 'Load sample'}
+            <HiSave className="w-5 h-5" />
           </button>
           <button
             type="button"
             onClick={() => setShowSourceDialog(true)}
             disabled={!workflow}
-            className="rounded border border-slate-300 bg-white px-2 py-1 text-sm text-slate-600 hover:bg-slate-50 disabled:opacity-50"
+            className="rounded border border-slate-300 bg-white p-2 text-slate-600 hover:bg-slate-50 disabled:opacity-50"
+            title="View source"
+            aria-label="View source"
           >
-            View source
+            <HiCode className="w-5 h-5" />
+          </button>
+          <button
+            type="button"
+            onClick={() => {
+              setIsEditingWorkflowName(false)
+              setWorkflow(workflow ? null : sampleWorkflow)
+            }}
+            className="rounded border border-slate-300 bg-white p-2 text-slate-600 hover:bg-slate-50"
+            title={workflow ? 'Clear' : 'Load sample'}
+            aria-label={workflow ? 'Clear' : 'Load sample'}
+          >
+            {workflow ? <HiTrash className="w-5 h-5" /> : <HiFolderOpen className="w-5 h-5" />}
           </button>
         </div>
         <div className="h-6 w-px bg-slate-200" aria-hidden />
         <div className="flex items-center gap-2" role="group" aria-label="Editor">
-          <button
-            type="button"
-            onClick={() => setShowWorkflowProperties(true)}
-            disabled={!workflow}
-            className={`rounded border px-2 py-1 text-sm font-medium disabled:opacity-50 ${
-              showWorkflowProperties
-                ? 'border-slate-500 bg-slate-100 text-slate-800 ring-1 ring-slate-300'
-                : 'border-slate-400 bg-slate-50 text-slate-700 hover:bg-slate-100 hover:border-slate-500'
-            }`}
-            title="Edit workflow name, run name, and environment variables"
-          >
-            Workflow config
-          </button>
           <button
             type="button"
             onClick={handleAddTrigger}
@@ -452,6 +509,22 @@ function AppInner() {
             className="rounded border border-blue-300 bg-blue-50 px-2 py-1 text-sm font-medium text-blue-700 hover:bg-blue-100"
           >
             + Add Job
+          </button>
+        </div>
+        <div className="ml-auto">
+          <button
+            type="button"
+            onClick={() => setShowWorkflowProperties(true)}
+            disabled={!workflow}
+            className={`rounded p-2 disabled:opacity-50 ${
+              showWorkflowProperties
+                ? 'bg-slate-100 text-slate-800'
+                : 'text-slate-600 hover:bg-slate-100'
+            }`}
+            title="Edit workflow name, run name, and environment variables"
+            aria-label="Workflow config"
+          >
+            <HiCog className="w-5 h-5" />
           </button>
         </div>
       </header>
