@@ -1,3 +1,10 @@
+## [1.0.4](https://github.com/timoa/github-actions-gui/compare/v1.0.3...v1.0.4) (2026-02-04)
+
+
+### Bug Fixes
+
+* **ui:** redesign the buttons by using icons ([6160ba1](https://github.com/timoa/github-actions-gui/commit/6160ba13ac4936d9f06fad6d285e022b114f816a))
+
 ## [1.0.3](https://github.com/timoa/github-actions-gui/compare/v1.0.2...v1.0.3) (2026-02-04)
 
 
