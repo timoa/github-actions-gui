@@ -68,37 +68,37 @@ export function SourceCodeDialog({
 
   return (
     <div
-      className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 p-4"
+      className="fixed inset-0 z-50 flex items-center justify-center bg-black/50 dark:bg-black/70 p-4"
       role="dialog"
       aria-modal="true"
       aria-labelledby="source-dialog-title"
       onClick={handleBackdropClick}
     >
       <div
-        className="flex h-[85vh] w-full max-w-4xl flex-col rounded-lg bg-white shadow-xl"
+        className="flex h-[85vh] w-full max-w-4xl flex-col rounded-lg bg-white dark:bg-slate-800 shadow-xl"
         onClick={(e) => e.stopPropagation()}
       >
-        <div className="flex items-center justify-between border-b border-slate-200 px-4 py-3">
-          <h2 id="source-dialog-title" className="text-lg font-semibold text-slate-800">
+        <div className="flex items-center justify-between border-b border-slate-200 dark:border-slate-700 px-4 py-3">
+          <h2 id="source-dialog-title" className="text-lg font-semibold text-slate-800 dark:text-slate-200">
             Workflow source (YAML)
           </h2>
           <button
             type="button"
             onClick={onClose}
-            className="rounded p-1 text-slate-400 hover:bg-slate-100 hover:text-slate-600"
+            className="rounded p-1 text-slate-400 dark:text-slate-500 hover:bg-slate-100 dark:hover:bg-slate-700 hover:text-slate-600 dark:hover:text-slate-300"
             aria-label="Close"
           >
             <span className="text-xl leading-none">×</span>
           </button>
         </div>
-        <div className="flex items-center justify-between border-b border-slate-100 px-4 py-2">
-          <p className="text-sm text-slate-500">
+        <div className="flex items-center justify-between border-b border-slate-100 dark:border-slate-700 px-4 py-2">
+          <p className="text-sm text-slate-500 dark:text-slate-400">
             Edit the YAML below. The flow diagram updates only when you click Save.
           </p>
           <button
             type="button"
             onClick={handleLint}
-            className="rounded border border-slate-300 bg-white px-2 py-1 text-xs text-slate-600 hover:bg-slate-50"
+            className="rounded border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-700 px-2 py-1 text-xs text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-600"
           >
             Check syntax
           </button>
@@ -108,7 +108,7 @@ export function SourceCodeDialog({
             ref={textareaRef}
             value={yaml}
             onChange={(e) => setYaml(e.target.value)}
-            className="flex-1 w-full resize-none rounded-none border-0 border-t border-slate-200 bg-slate-50 p-4 font-mono text-sm text-slate-800 focus:ring-0"
+            className="flex-1 w-full resize-none rounded-none border-0 border-t border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-900 p-4 font-mono text-sm text-slate-800 dark:text-slate-200 focus:ring-0"
             spellCheck={false}
             aria-label="Workflow YAML content"
           />
@@ -116,7 +116,7 @@ export function SourceCodeDialog({
         {(saveError || lintErrors.length > 0) && (
           <div
             role="alert"
-            className="border-t border-amber-200 bg-amber-50 px-4 py-2 text-sm text-amber-800 max-h-40 overflow-y-auto"
+            className="border-t border-amber-200 dark:border-amber-800 bg-amber-50 dark:bg-amber-900/30 px-4 py-2 text-sm text-amber-800 dark:text-amber-200 max-h-40 overflow-y-auto"
           >
             {saveError && <div className="mb-2 font-medium">{saveError}</div>}
             {lintErrors.length > 0 && (
@@ -137,18 +137,18 @@ export function SourceCodeDialog({
             )}
           </div>
         )}
-        <div className="flex justify-end gap-2 border-t border-slate-200 px-4 py-3">
+        <div className="flex justify-end gap-2 border-t border-slate-200 dark:border-slate-700 px-4 py-3">
           <button
             type="button"
             onClick={onClose}
-            className="rounded border border-slate-300 bg-white px-3 py-1.5 text-sm text-slate-600 hover:bg-slate-50"
+            className="rounded border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-700 px-3 py-1.5 text-sm text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-600"
           >
             Cancel
           </button>
           <button
             type="button"
             onClick={handleSave}
-            className="rounded bg-slate-800 px-3 py-1.5 text-sm text-white hover:bg-slate-700"
+            className="rounded bg-slate-800 dark:bg-slate-700 px-3 py-1.5 text-sm text-white dark:text-slate-200 hover:bg-slate-700 dark:hover:bg-slate-600"
           >
             Save changes
           </button>

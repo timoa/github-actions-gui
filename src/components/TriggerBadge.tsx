@@ -2,7 +2,7 @@ import { HiOutlineUpload, HiOutlineRefresh, HiOutlineClock, HiOutlinePlay } from
 import { formatTrigger } from '@/lib/triggerUtils'
 import type { ParsedTrigger } from '@/lib/triggerUtils'
 
-const iconClass = 'shrink-0 text-purple-700'
+const iconClass = 'shrink-0 text-purple-700 dark:text-purple-300'
 
 function getEventIcon(event: string): React.ReactNode {
   const e = event.toLowerCase()
@@ -62,7 +62,7 @@ export function TriggerBadge({ trigger, className = '' }: TriggerBadgeProps) {
       {badges.map(({ icon, label }, i) => (
         <span
           key={i}
-          className={`inline-flex items-center gap-1 rounded bg-purple-100 px-1.5 py-0.5 text-xs font-medium text-purple-800 ${className}`}
+          className={`inline-flex items-center gap-1 rounded bg-purple-100 dark:bg-purple-900/30 px-1.5 py-0.5 text-xs font-medium text-purple-800 dark:text-purple-200 ${className}`}
           title={fullTitle}
         >
           {icon}

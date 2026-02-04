@@ -10,18 +10,18 @@ function getRunnerIconAndVersion(runsOn: string): { icon: React.ReactNode; versi
   }
   if (first.startsWith('macos')) {
     const version = first.slice('macos-'.length) || 'latest'
-    return { icon: <SiApple className="text-gray-700 shrink-0" size={14} />, version }
+    return { icon: <SiApple className="text-gray-700 dark:text-gray-300 shrink-0" size={14} />, version }
   }
   if (first.startsWith('windows')) {
     const version = first.slice('windows-'.length) || 'latest'
     return { icon: <FaWindows className="text-blue-500 shrink-0" size={14} />, version }
   }
   if (first === 'self-hosted' || first.startsWith('self-hosted')) {
-    return { icon: <HiServer className="text-slate-600 shrink-0" size={14} />, version: 'self-hosted' }
+    return { icon: <HiServer className="text-slate-600 dark:text-slate-400 shrink-0" size={14} />, version: 'self-hosted' }
   }
   // Unknown runner: show generic server icon and use part after first hyphen or full string
   const version = first.includes('-') ? first.slice(first.indexOf('-') + 1) : first || 'latest'
-  return { icon: <HiServer className="text-slate-600 shrink-0" size={14} />, version }
+  return { icon: <HiServer className="text-slate-600 dark:text-slate-400 shrink-0" size={14} />, version }
 }
 
 interface RunnerBadgeProps {
@@ -33,7 +33,7 @@ export function RunnerBadge({ runsOn, className = '' }: RunnerBadgeProps) {
   const { icon, version } = getRunnerIconAndVersion(runsOn)
   return (
     <span
-      className={`inline-flex items-center gap-1 rounded bg-slate-100 px-1.5 py-0.5 text-xs text-slate-600 ${className}`}
+      className={`inline-flex items-center gap-1 rounded bg-slate-100 dark:bg-slate-700 px-1.5 py-0.5 text-xs text-slate-600 dark:text-slate-300 ${className}`}
       title={runsOn || 'ubuntu-latest'}
     >
       {icon}

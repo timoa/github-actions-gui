@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from 'react'
+import { useTheme } from 'next-themes'
 import {
   ReactFlow,
   Background,
@@ -10,6 +11,7 @@ import {
 } from '@xyflow/react'
 import '@xyflow/react/dist/style.css'
 import { HiCog, HiFolderOpen, HiClipboardCopy, HiSave, HiTrash, HiCode } from 'react-icons/hi'
+import { HiMoon, HiSun } from 'react-icons/hi'
 import { AddJobNode } from '@/components/AddJobNode'
 import { JobNode } from '@/components/JobNode'
 import { JobPropertyPanel } from '@/components/JobPropertyPanel'
@@ -51,6 +53,37 @@ const sampleWorkflow: Workflow = {
 }
 
 function AppInner() {
+  const { theme, setTheme, resolvedTheme } = useTheme()
+  const [mounted, setMounted] = useState(false)
+  
+  // Handle mounting - next-themes needs this to avoid hydration issues
+  useEffect(() => {
+    setMounted(true)
+  }, [])
+  
+  const toggleTheme = () => {
+    if (!mounted) return
+    // Get the current resolved theme (actual theme being used)
+    const currentTheme = resolvedTheme || theme || 'light'
+    // Toggle to the opposite
+    const nextTheme = currentTheme === 'dark' ? 'light' : 'dark'
+    console.log('Toggling theme:', { currentTheme, nextTheme, theme, resolvedTheme, mounted })
+    
+    // Apply theme immediately as fallback
+    const root = document.documentElement
+    if (nextTheme === 'dark') {
+      root.classList.add('dark')
+    } else {
+      root.classList.remove('dark')
+    }
+    
+    // Also use next-themes to persist
+    setTheme(nextTheme)
+  }
+  
+  // Use resolvedTheme for display (handles 'system' theme)
+  // resolvedTheme is undefined until mounted, so fallback to theme
+  const displayTheme = mounted ? (resolvedTheme || theme || 'light') : 'light'
   const [workflow, setWorkflow] = useState<Workflow | null>(null)
   const [selectedJobId, setSelectedJobId] = useState<string | null>(null)
   const [selectedTrigger, setSelectedTrigger] = useState<boolean>(false)
@@ -383,7 +416,7 @@ function AppInner() {
   )
 
   return (
-    <div className="h-full w-full flex flex-col bg-slate-100">
+    <div className="h-full w-full flex flex-col bg-slate-100 dark:bg-slate-900">
       <input
         ref={fileInputRef}
         type="file"
@@ -413,7 +446,7 @@ function AppInner() {
           }}
         />
       )}
-      <header className="flex flex-wrap items-center gap-4 border-b border-slate-200 bg-white px-4 py-2 shadow-sm">
+      <header className="flex flex-wrap items-center gap-4 border-b border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 px-4 py-2 shadow-sm">
         <div className="flex items-center gap-2 flex-1 min-w-0">
           {workflow ? (
             isEditingWorkflowName ? (
@@ -424,12 +457,12 @@ function AppInner() {
                 onChange={(e) => handleWorkflowNameChange(e.target.value)}
                 onBlur={() => setIsEditingWorkflowName(false)}
                 onKeyDown={handleWorkflowNameKeyDown}
-                className="text-lg font-semibold text-slate-800 bg-transparent border-b-2 border-slate-400 focus:border-slate-600 focus:outline-none px-1 -mx-1 min-w-0 flex-1 max-w-md"
+                className="text-lg font-semibold text-slate-800 dark:text-slate-200 bg-transparent border-b-2 border-slate-400 dark:border-slate-600 focus:border-slate-600 dark:focus:border-slate-400 focus:outline-none px-1 -mx-1 min-w-0 flex-1 max-w-md"
                 placeholder="Untitled Workflow"
               />
             ) : (
               <h1
-                className="text-lg font-semibold text-slate-800 cursor-text hover:text-slate-600 transition-colors min-w-0 flex-1"
+                className="text-lg font-semibold text-slate-800 dark:text-slate-200 cursor-text hover:text-slate-600 dark:hover:text-slate-300 transition-colors min-w-0 flex-1"
                 onClick={() => setIsEditingWorkflowName(true)}
                 title="Click to edit workflow name"
               >
@@ -437,16 +470,16 @@ function AppInner() {
               </h1>
             )
           ) : (
-            <h1 className="text-lg font-semibold text-slate-400">No workflow loaded</h1>
+            <h1 className="text-lg font-semibold text-slate-400 dark:text-slate-500">No workflow loaded</h1>
           )}
         </div>
-        <div className="text-xs text-slate-400 font-medium">GitHub Actions GUI</div>
-        <div className="h-6 w-px bg-slate-200" aria-hidden />
+        <div className="text-xs text-slate-400 dark:text-slate-500 font-medium">GitHub Actions GUI</div>
+        <div className="h-6 w-px bg-slate-200 dark:bg-slate-700" aria-hidden />
         <div className="flex items-center gap-2" role="group" aria-label="File">
           <button
             type="button"
             onClick={() => fileInputRef.current?.click()}
-            className="rounded border border-slate-300 bg-white p-2 text-slate-600 hover:bg-slate-50"
+            className="rounded border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-700 p-2 text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-600"
             title="Open file"
             aria-label="Open file"
           >
@@ -455,7 +488,7 @@ function AppInner() {
           <button
             type="button"
             onClick={() => setShowPasteDialog(true)}
-            className="rounded border border-slate-300 bg-white p-2 text-slate-600 hover:bg-slate-50"
+            className="rounded border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-700 p-2 text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-600"
             title="Paste YAML"
             aria-label="Paste YAML"
           >
@@ -465,7 +498,7 @@ function AppInner() {
             type="button"
             onClick={handleSave}
             disabled={!workflow || !hasJobs}
-            className="rounded border border-slate-300 bg-white p-2 text-slate-600 hover:bg-slate-50 disabled:opacity-50"
+            className="rounded border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-700 p-2 text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-600 disabled:opacity-50"
             title="Save"
             aria-label="Save"
           >
@@ -475,7 +508,7 @@ function AppInner() {
             type="button"
             onClick={() => setShowSourceDialog(true)}
             disabled={!workflow}
-            className="rounded border border-slate-300 bg-white p-2 text-slate-600 hover:bg-slate-50 disabled:opacity-50"
+            className="rounded border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-700 p-2 text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-600 disabled:opacity-50"
             title="View source"
             aria-label="View source"
           >
@@ -487,7 +520,7 @@ function AppInner() {
               setIsEditingWorkflowName(false)
               setWorkflow(workflow ? null : sampleWorkflow)
             }}
-            className="rounded border border-slate-300 bg-white p-2 text-slate-600 hover:bg-slate-50"
+            className="rounded border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-700 p-2 text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-600"
             title={workflow ? 'Clear' : 'Load sample'}
             aria-label={workflow ? 'Clear' : 'Load sample'}
           >
@@ -499,27 +532,36 @@ function AppInner() {
           <button
             type="button"
             onClick={handleAddTrigger}
-            className="rounded border border-purple-300 bg-purple-50 px-2 py-1 text-sm font-medium text-purple-700 hover:bg-purple-100"
+            className="rounded border border-purple-300 dark:border-purple-600 bg-purple-50 dark:bg-purple-900/30 px-2 py-1 text-sm font-medium text-purple-700 dark:text-purple-300 hover:bg-purple-100 dark:hover:bg-purple-900/50"
           >
             + Add Trigger
           </button>
           <button
             type="button"
             onClick={() => handleAddJob()}
-            className="rounded border border-blue-300 bg-blue-50 px-2 py-1 text-sm font-medium text-blue-700 hover:bg-blue-100"
+            className="rounded border border-blue-300 dark:border-blue-600 bg-blue-50 dark:bg-blue-900/30 px-2 py-1 text-sm font-medium text-blue-700 dark:text-blue-300 hover:bg-blue-100 dark:hover:bg-blue-900/50"
           >
             + Add Job
           </button>
         </div>
-        <div className="ml-auto">
+        <div className="ml-auto flex items-center gap-2">
+          <button
+            type="button"
+            onClick={toggleTheme}
+            className="rounded p-2 text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700"
+            title={displayTheme === 'dark' ? 'Switch to light mode' : 'Switch to dark mode'}
+            aria-label={displayTheme === 'dark' ? 'Switch to light mode' : 'Switch to dark mode'}
+          >
+            {displayTheme === 'dark' ? <HiSun className="w-5 h-5" /> : <HiMoon className="w-5 h-5" />}
+          </button>
           <button
             type="button"
             onClick={() => setShowWorkflowProperties(true)}
             disabled={!workflow}
             className={`rounded p-2 disabled:opacity-50 ${
               showWorkflowProperties
-                ? 'bg-slate-100 text-slate-800'
-                : 'text-slate-600 hover:bg-slate-100'
+                ? 'bg-slate-100 dark:bg-slate-700 text-slate-800 dark:text-slate-200'
+                : 'text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700'
             }`}
             title="Edit workflow name, run name, and environment variables"
             aria-label="Workflow config"
@@ -531,7 +573,7 @@ function AppInner() {
       {(parseErrors.length > 0 || lintErrors.length > 0) && (
         <div
           role="alert"
-          className="flex flex-col gap-2 border-b border-amber-200 bg-amber-50 px-4 py-2 text-sm text-amber-800"
+          className="flex flex-col gap-2 border-b border-amber-200 dark:border-amber-800 bg-amber-50 dark:bg-amber-900/30 px-4 py-2 text-sm text-amber-800 dark:text-amber-200"
         >
           <div className="flex items-center justify-between">
             <span>
@@ -546,7 +588,7 @@ function AppInner() {
                 setParseErrors([])
                 setLintErrors([])
               }}
-              className="shrink-0 rounded p-1 hover:bg-amber-100"
+              className="shrink-0 rounded p-1 hover:bg-amber-100 dark:hover:bg-amber-800/50"
               aria-label="Dismiss errors"
             >
               ×
@@ -584,19 +626,19 @@ function AppInner() {
               onNodeClick={onNodeClick}
               nodeTypes={nodeTypes}
               fitView
-              className="bg-slate-50"
+              className="bg-slate-50 dark:bg-slate-900"
             >
               <Background />
               <Controls />
               <MiniMap />
             </ReactFlow>
           ) : (
-            <div className="absolute inset-0 flex flex-col items-center justify-center bg-slate-50 gap-4">
-              <p className="text-slate-500">No jobs in workflow.</p>
+            <div className="absolute inset-0 flex flex-col items-center justify-center bg-slate-50 dark:bg-slate-900 gap-4">
+              <p className="text-slate-500 dark:text-slate-400">No jobs in workflow.</p>
               <button
                 type="button"
                 onClick={() => handleAddJob()}
-                className="rounded border border-blue-300 bg-blue-50 px-4 py-2 text-sm font-medium text-blue-700 hover:bg-blue-100"
+                className="rounded border border-blue-300 dark:border-blue-600 bg-blue-50 dark:bg-blue-900/30 px-4 py-2 text-sm font-medium text-blue-700 dark:text-blue-300 hover:bg-blue-100 dark:hover:bg-blue-900/50"
               >
                 + Add Your First Job
               </button>
