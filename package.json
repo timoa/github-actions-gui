@@ -45,6 +45,19 @@
         "command": "workflow-visual-editor.openWithEditor",
         "title": "Open with Workflow Editor",
         "category": "Workflow Editor"
+      },
+      {
+        "command": "workflow-visual-editor.save",
+        "title": "Save",
+        "category": "Workflow Editor"
+      }
+    ],
+    "keybindings": [
+      {
+        "command": "workflow-visual-editor.save",
+        "key": "ctrl+s",
+        "mac": "cmd+s",
+        "when": "workflowEditorFocus"
       }
     ],
     "menus": {

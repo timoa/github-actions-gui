@@ -55,6 +55,13 @@ export class WorkflowEditorProvider {
     // This happens when the user closes the panel or when the panel is closed programmatically
     this._panel.onDidDispose(() => this.dispose(), null, this._disposables);
 
+    // Set context key for keybinding (Ctrl+S when workflow editor is focused)
+    const updateFocusContext = () => {
+      vscode.commands.executeCommand('setContext', 'workflowEditorFocus', this._panel.active);
+    };
+    updateFocusContext();
+    this._panel.onDidChangeViewState(updateFocusContext, null, this._disposables);
+
     // Handle messages from the webview
     this._panel.webview.onDidReceiveMessage(
       async (message) => {
@@ -94,8 +101,19 @@ export class WorkflowEditorProvider {
 
   private _pendingFile: vscode.Uri | undefined;
   private _isWebviewReady: boolean = false;
+  /** When set, Save writes directly to this file instead of showing Save As dialog. */
+  private _currentFileUri: vscode.Uri | undefined;
+
+  public static getInstance(): WorkflowEditorProvider | undefined {
+    return WorkflowEditorProvider._instance;
+  }
+
+  public requestSave(): void {
+    this._panel.webview.postMessage({ command: 'saveRequest' });
+  }
 
   public async loadFile(uri: vscode.Uri) {
+    this._currentFileUri = uri;
     try {
       const document = await vscode.workspace.openTextDocument(uri);
       const content = document.getText();
@@ -133,9 +151,12 @@ export class WorkflowEditorProvider {
   }
 
   private async _handleSaveFile(content: string, suggestedFilename?: string) {
-    const fileUri = await vscode.window.showSaveDialog({
+    const fileUri = this._currentFileUri ?? (await vscode.window.showSaveDialog({
       defaultUri: suggestedFilename
-        ? vscode.Uri.file(suggestedFilename)
+        ? vscode.Uri.joinPath(
+            vscode.workspace.workspaceFolders?.[0]?.uri || vscode.Uri.file(''),
+            suggestedFilename
+          )
         : vscode.Uri.joinPath(
             vscode.workspace.workspaceFolders?.[0]?.uri || vscode.Uri.file(''),
             'workflow.yml'
@@ -143,13 +164,16 @@ export class WorkflowEditorProvider {
       filters: {
         'YAML Files': ['yml', 'yaml'],
       },
-    });
+    })) ?? undefined;
 
     if (fileUri) {
       try {
         const encoder = new TextEncoder();
         const data = encoder.encode(content);
         await vscode.workspace.fs.writeFile(fileUri, data);
+        if (!this._currentFileUri) {
+          this._currentFileUri = fileUri;
+        }
         vscode.window.showInformationMessage(`Workflow saved to ${path.basename(fileUri.fsPath)}`);
       } catch (error) {
         vscode.window.showErrorMessage(`Failed to save file: ${error}`);
@@ -213,6 +237,7 @@ export class WorkflowEditorProvider {
   }
 
   public dispose() {
+    vscode.commands.executeCommand('setContext', 'workflowEditorFocus', false);
     WorkflowEditorProvider._instance = undefined;
 
     // Clean up our resources

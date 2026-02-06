@@ -27,6 +27,9 @@ window.addEventListener('message', (event) => {
         })
       )
       break
+    case 'saveRequest':
+      window.dispatchEvent(new CustomEvent('vscode-saveRequest'))
+      break
   }
 })
 

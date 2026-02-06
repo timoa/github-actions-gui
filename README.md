@@ -13,8 +13,9 @@ A VSCode extension providing a visual editor for GitHub Actions workflow files. 
 - **Matrix strategy**: Configure matrix builds with multiple variable combinations. Visual indicator shows total matrix combinations (e.g., "6× matrix").
 - **Source code preview**: View and edit workflow YAML in a large dialog. Changes apply only when saved.
 - **Workflow linting**: Automatic validation of workflow syntax, trigger names, job dependencies, and circular dependencies with detailed error messages.
-- **VSCode Integration**: Open files via VSCode file dialogs, save directly to workspace. Theme automatically matches your IDE theme.
-- **Validation**: Parse errors and lint errors shown in a banner when opening, pasting, or editing workflows.
+- **VSCode Integration**: Open workflow files via context menu or command palette; save directly to workspace. Theme automatically follows your IDE theme (no in-editor theme toggle).
+- **Simplified navbar**: Toolbar keeps Save, View source, Clear/Load sample, Add Trigger/Job, and workflow config; Open file, Paste YAML, and theme buttons were removed for a cleaner UX.
+- **Validation**: Parse errors and lint errors shown in a banner when opening or editing workflows.
 
 ## Installation
 
@@ -43,15 +44,13 @@ A VSCode extension providing a visual editor for GitHub Actions workflow files. 
 
 ### Keyboard Shortcuts
 
-- **Ctrl/Cmd+O**: Open file (in webview)
-- **Ctrl/Cmd+S**: Save workflow (in webview)
-- **Escape**: Close property panel or paste dialog
+- **Ctrl/Cmd+S**: Save workflow (when the Workflow Editor tab is focused; uses VSCode command so it works reliably)
+- **Escape**: Close property panel or source dialog
 
 ### File Operations
 
-- **Open**: Click the folder icon or use Ctrl/Cmd+O to open a workflow file
-- **Paste YAML**: Click the clipboard icon to paste YAML content
-- **Save**: Click the save icon or use Ctrl/Cmd+S to save the workflow
+- **Open**: Use the Command Palette ("Workflow Editor: Open Workflow File") or right-click a `.yml`/`.yaml` file in the Explorer and choose "Open with Workflow Editor"
+- **Save**: Click the save icon in the toolbar or press Ctrl/Cmd+S when the workflow editor is focused
 - **View Source**: Click the code icon to view/edit raw YAML
 
 ## Development
@@ -162,9 +161,8 @@ To get a token:
 
 ## Keyboard shortcuts
 
-- **Ctrl/Cmd+O**: Open file
-- **Ctrl/Cmd+S**: Save workflow
-- **Escape**: Close property panel or paste dialog
+- **Ctrl/Cmd+S**: Save workflow (when Workflow Editor tab is focused)
+- **Escape**: Close property panel or source dialog
 
 ## Stack
 

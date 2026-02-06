@@ -9,17 +9,15 @@ import {
   type OnSelectionChangeFunc,
 } from '@xyflow/react'
 import '@xyflow/react/dist/style.css'
-import { HiCog, HiFolderOpen, HiClipboardCopy, HiSave, HiTrash, HiCode } from 'react-icons/hi'
-import { HiMoon, HiSun } from 'react-icons/hi'
+import { HiCog, HiFolderOpen, HiSave, HiTrash, HiCode } from 'react-icons/hi'
 import { AddJobNode } from './components/AddJobNode'
 import { JobNode } from './components/JobNode'
 import { JobPropertyPanel } from './components/JobPropertyPanel'
 import { TriggerNode } from './components/TriggerNode'
 import { TriggerPropertyPanel } from './components/TriggerPropertyPanel'
 import { WorkflowPropertyPanel } from './components/WorkflowPropertyPanel'
-import { PasteYamlDialog } from './components/PasteYamlDialog'
 import { SourceCodeDialog } from './components/SourceCodeDialog'
-import { openWorkflowFromYaml, saveWorkflowToFile, requestOpenFile, getVscode } from './lib/fileHandling'
+import { openWorkflowFromYaml, saveWorkflowToFile, getVscode } from './lib/fileHandling'
 import { serializeWorkflow } from './lib/serializeWorkflow'
 import { parseTriggers, triggersToOn } from './lib/triggerUtils'
 import { lintWorkflow, type LintError } from './lib/workflowLinter'
@@ -52,7 +50,7 @@ const sampleWorkflow: Workflow = {
 }
 
 function AppInner() {
-  const [theme, setTheme] = useState<'light' | 'dark'>('dark')
+  const [, setTheme] = useState<'light' | 'dark'>('dark')
   const [workflow, setWorkflow] = useState<Workflow | null>(null)
   const [selectedJobId, setSelectedJobId] = useState<string | null>(null)
   
@@ -109,18 +107,10 @@ function AppInner() {
     }
   }, [selectedJobId])
 
-  const toggleTheme = () => {
-    // In VSCode, we can't toggle theme - it follows IDE theme
-    // This button could be removed or disabled, but keeping for UI consistency
-    // The theme will automatically update when VSCode theme changes
-  }
-
-  const displayTheme = theme
   const [selectedTrigger, setSelectedTrigger] = useState<boolean>(false)
   const [showWorkflowProperties, setShowWorkflowProperties] = useState<boolean>(false)
   const [parseErrors, setParseErrors] = useState<string[]>([])
   const [lintErrors, setLintErrors] = useState<LintError[]>([])
-  const [showPasteDialog, setShowPasteDialog] = useState(false)
   const [showSourceDialog, setShowSourceDialog] = useState(false)
   const [isEditingWorkflowName, setIsEditingWorkflowName] = useState(false)
   const workflowNameInputRef = useRef<HTMLInputElement>(null)
@@ -221,28 +211,6 @@ function AppInner() {
       setSelectedTrigger(false)
     }
   }, [])
-
-  const handleOpenFile = useCallback(() => {
-    requestOpenFile()
-  }, [])
-
-  const handlePasteLoad = useCallback((yaml: string) => {
-    const { workflow: w, errors } = openWorkflowFromYaml(yaml)
-    setIsEditingWorkflowName(false)
-    isUpdatingWorkflowRef.current = true
-    setWorkflow(w)
-    setParseErrors(errors)
-    // Preserve selection if the job still exists
-    if (selectedJobId && w.jobs[selectedJobId]) {
-      // Keep selection - it will be preserved by nodesSelection
-    } else {
-      setSelectedJobId(null)
-    }
-    // Reset flag after a brief delay to allow React Flow to update
-    setTimeout(() => {
-      isUpdatingWorkflowRef.current = false
-    }, 100)
-  }, [selectedJobId])
 
   const handleSave = useCallback(() => {
     if (!workflow) return
@@ -360,10 +328,6 @@ function AppInner() {
 
   const handleKeyDown = useCallback(
     (e: KeyboardEvent) => {
-      if (showPasteDialog) {
-        if (e.key === 'Escape') setShowPasteDialog(false)
-        return
-      }
       if (showSourceDialog) {
         if (e.key === 'Escape') setShowSourceDialog(false)
         return
@@ -373,16 +337,12 @@ function AppInner() {
         setSelectedJobId(null)
         return
       }
-      if ((e.metaKey || e.ctrlKey) && e.key === 'o') {
-        e.preventDefault()
-        handleOpenFile()
-      }
       if ((e.metaKey || e.ctrlKey) && e.key === 's') {
         e.preventDefault()
         if (workflow && hasJobs) handleSave()
       }
     },
-    [showPasteDialog, showSourceDialog, workflow, hasJobs, handleSave, handleOpenFile]
+    [showSourceDialog, workflow, hasJobs, handleSave]
   )
 
   useEffect(() => {
@@ -422,14 +382,17 @@ function AppInner() {
     []
   )
 
+  // Listen for save request from VSCode (e.g. Ctrl+S when workflow editor is focused)
+  useEffect(() => {
+    const onSaveRequest = () => {
+      if (workflow && hasJobs) handleSave()
+    }
+    window.addEventListener('vscode-saveRequest', onSaveRequest)
+    return () => window.removeEventListener('vscode-saveRequest', onSaveRequest)
+  }, [workflow, hasJobs, handleSave])
+
   return (
     <div className="h-full w-full flex flex-col bg-slate-100 dark:bg-slate-900 pr-4 box-border max-w-full overflow-x-hidden">
-      {showPasteDialog && (
-        <PasteYamlDialog
-          onClose={() => setShowPasteDialog(false)}
-          onLoad={handlePasteLoad}
-        />
-      )}
       {showSourceDialog && workflow && (
         <SourceCodeDialog
           initialYaml={serializeWorkflow(workflow)}
@@ -475,24 +438,6 @@ function AppInner() {
         <div className="text-[11px] text-slate-400 dark:text-slate-500 font-medium">Workflow Editor</div>
         <div className="h-6 w-px bg-slate-200 dark:bg-slate-700" aria-hidden />
         <div className="flex items-center gap-2" role="group" aria-label="File">
-          <button
-            type="button"
-            onClick={handleOpenFile}
-            className="rounded border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-700 p-2 text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-600"
-            title="Open file"
-            aria-label="Open file"
-          >
-            <HiFolderOpen className="w-5 h-5" />
-          </button>
-          <button
-            type="button"
-            onClick={() => setShowPasteDialog(true)}
-            className="rounded border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-700 p-2 text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-600"
-            title="Paste YAML"
-            aria-label="Paste YAML"
-          >
-            <HiClipboardCopy className="w-5 h-5" />
-          </button>
           <button
             type="button"
             onClick={handleSave}
@@ -544,16 +489,6 @@ function AppInner() {
           </button>
         </div>
         <div className="ml-auto flex items-center gap-2">
-          <button
-            type="button"
-            onClick={toggleTheme}
-            disabled
-            className="rounded p-2 text-slate-400 dark:text-slate-500 cursor-not-allowed opacity-50"
-            title="Theme follows VSCode theme"
-            aria-label="Theme follows VSCode theme"
-          >
-            {displayTheme === 'dark' ? <HiSun className="w-5 h-5" /> : <HiMoon className="w-5 h-5" />}
-          </button>
           <button
             type="button"
             onClick={() => setShowWorkflowProperties(true)}

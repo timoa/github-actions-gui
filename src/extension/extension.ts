@@ -33,7 +33,15 @@ export function activate(context: vscode.ExtensionContext) {
     }
   );
 
-  context.subscriptions.push(openCommand, openFileCommand, openWithEditorCommand);
+  // Register save command (triggered by Ctrl+S when workflow editor is focused)
+  const saveCommand = vscode.commands.registerCommand('workflow-visual-editor.save', () => {
+    const provider = WorkflowEditorProvider.getInstance();
+    if (provider) {
+      provider.requestSave();
+    }
+  });
+
+  context.subscriptions.push(openCommand, openFileCommand, openWithEditorCommand, saveCommand);
 
   // If a .yml/.yaml file is already open, offer to open it in the editor
   if (vscode.window.activeTextEditor) {
