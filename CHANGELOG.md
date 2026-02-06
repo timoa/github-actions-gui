@@ -1,3 +1,10 @@
+## [1.2.2](https://github.com/timoa/workflow-editor/compare/v1.2.1...v1.2.2) (2026-02-06)
+
+
+### Bug Fixes
+
+* **cicd:** fix the publish workflow ([e000eae](https://github.com/timoa/workflow-editor/commit/e000eaef09500e7d6808421f45d2ad084a2c037c))
+
 ## [1.2.1](https://github.com/timoa/workflow-editor/compare/v1.2.0...v1.2.1) (2026-02-06)
 
 
