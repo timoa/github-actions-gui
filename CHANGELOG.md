@@ -1,3 +1,10 @@
+## [1.2.9](https://github.com/timoa/workflow-editor/compare/v1.2.8...v1.2.9) (2026-02-06)
+
+
+### Bug Fixes
+
+* **extension:** fix the save keyboard shortcut ([27c6320](https://github.com/timoa/workflow-editor/commit/27c632056fee7085c935a143f3d694d8bc19614d))
+
 ## [1.2.8](https://github.com/timoa/workflow-editor/compare/v1.2.7...v1.2.8) (2026-02-06)
 
 
