@@ -1,3 +1,10 @@
+## [1.2.5](https://github.com/timoa/workflow-editor/compare/v1.2.4...v1.2.5) (2026-02-06)
+
+
+### Bug Fixes
+
+* **project:** fix extension name ([486771c](https://github.com/timoa/workflow-editor/commit/486771ce9d653d2891cb6f74c82f81be8cdfc84a))
+
 ## [1.2.4](https://github.com/timoa/workflow-editor/compare/v1.2.3...v1.2.4) (2026-02-06)
 
 
