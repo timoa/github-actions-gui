@@ -1,13 +1,12 @@
 {
   "name": "workflow-visual-editor",
-  "displayName": "Workflow visual Editor",
+  "displayName": "Workflow Visual Editor",
   "description": "Visual editor for GitHub Actions workflow files",
   "version": "1.2.6",
   "publisher": "Timoa",
   "author": "Damien Laureaux",
   "homepage": "https://workflow-editor.com",
   "license": "MIT",
-  "type": "module",
   "repository": {
     "type": "git",
     "url": "https://github.com/timoa/workflow-editor.git"

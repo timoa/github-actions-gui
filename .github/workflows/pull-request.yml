@@ -14,7 +14,7 @@ on:
       - 'tsconfig.webview.json'
       - 'tailwind.config.js'
       - 'postcss.config.js'
-      - 'eslint.config.js'
+      - 'eslint.config.mjs'
       - 'webpack.config.cjs'
       - 'index.html'
       - '.github/workflows/pull-request.yml'
