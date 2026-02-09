@@ -14,6 +14,7 @@ A VSCode extension providing a visual editor for GitHub Actions workflow files. 
 - **Property panel**: Click a job node to edit name, runs-on, needs, matrix strategy, and steps (N8N-style).
 - **Matrix strategy**: Configure matrix builds with multiple variable combinations. Visual indicator shows total matrix combinations (e.g., "6× matrix").
 - **Source code preview**: View and edit workflow YAML in a large dialog. Changes apply only when saved.
+- **Run script editor**: Edit step run scripts in a full-size popup dialog with a comfortable code-style editor (same font and theme as the app). Click "Edit script" next to a step’s run field to open the dialog; save with **Save changes** or **Ctrl/Cmd+S**, cancel with **Escape**.
 - **Workflow validation**: Automatic validation using the official [@actions/workflow-parser](https://github.com/actions/languageservices) (same as the GitHub Actions VS Code extension). Reports schema and syntax errors with detailed messages.
 - **VSCode Integration**: Open workflow files via context menu or command palette; save directly to workspace. Theme automatically follows your IDE theme (no in-editor theme toggle).
 - **Simplified navbar**: Toolbar keeps Save, View source, Clear/Load sample, Add Trigger/Job, and workflow config; Open file, Paste YAML, and theme buttons were removed for a cleaner UX.
@@ -48,7 +49,7 @@ A VSCode extension providing a visual editor for GitHub Actions workflow files. 
 
 - **Ctrl/Cmd+Z**: Undo last change (when the Workflow Editor tab is focused)
 - **Ctrl/Cmd+S**: Save workflow (when the Workflow Editor tab is focused; uses VSCode command so it works reliably)
-- **Escape**: Close property panel or source dialog
+- **Escape**: Close property panel, source dialog, or run script dialog
 
 ### File Operations
 
@@ -166,7 +167,7 @@ To get a token:
 
 - **Ctrl/Cmd+Z**: Undo last change (when Workflow Editor tab is focused)
 - **Ctrl/Cmd+S**: Save workflow (when Workflow Editor tab is focused)
-- **Escape**: Close property panel or source dialog
+- **Escape**: Close property panel, source dialog, or run script dialog
 
 ## Stack
 

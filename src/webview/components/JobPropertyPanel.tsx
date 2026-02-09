@@ -8,6 +8,7 @@ import {
 import { SiUbuntu, SiApple } from 'react-icons/si'
 import { FaWindows } from 'react-icons/fa'
 import { HiServer } from 'react-icons/hi'
+import { RunScriptDialog } from './RunScriptDialog'
 
 // Icon components for different platforms
 // Ubuntu logo (circle of friends) – orange roundel, three white figures
@@ -88,6 +89,8 @@ export function JobPropertyPanel({
     },
     [updateJob]
   )
+
+  const [runDialogStepIndex, setRunDialogStepIndex] = useState<number | null>(null)
 
   const runsOn = job
     ? Array.isArray(job['runs-on'])
@@ -838,13 +841,18 @@ className={`w-full px-1.5 py-1 text-xs text-left hover:bg-slate-50 dark:hover:bg
                       )}
                     </div>
                   )}
-                  <textarea
-                    value={step.run ?? ''}
-                    onChange={(e) => updateStep(index, (s) => ({ ...s, run: e.target.value || undefined }))}
-                    className="w-full rounded border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-700 text-slate-900 dark:text-slate-200 px-1.5 py-1 text-xs font-mono"
-                    placeholder="run: ..."
-                    rows={2}
-                  />
+                  <div className="flex flex-col gap-1">
+                    <div className="rounded border border-slate-300 dark:border-slate-600 bg-slate-50 dark:bg-slate-800 px-1.5 py-1.5 text-xs font-mono text-slate-700 dark:text-slate-300 min-h-[2.5rem] overflow-hidden text-ellipsis whitespace-nowrap">
+                      {(step.run ?? '').trim().split('\n')[0] || 'run: ...'}
+                    </div>
+                    <button
+                      type="button"
+                      onClick={() => setRunDialogStepIndex(index)}
+                      className="w-full rounded border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-700 px-1.5 py-1 text-xs text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-600"
+                    >
+                      Edit script
+                    </button>
+                  </div>
                 </div>
               </li>
             ))}
@@ -862,6 +870,17 @@ className={`w-full px-1.5 py-1 text-xs text-left hover:bg-slate-50 dark:hover:bg
             Delete job
           </button>
         </div>
+      )}
+      {runDialogStepIndex !== null && job?.steps?.[runDialogStepIndex] && (
+        <RunScriptDialog
+          initialValue={job.steps[runDialogStepIndex]?.run ?? ''}
+          stepLabel={`Step ${runDialogStepIndex + 1}${job.steps[runDialogStepIndex]?.name ? `: ${job.steps[runDialogStepIndex].name}` : ''}`}
+          onSave={(value) => {
+            updateStep(runDialogStepIndex, (s) => ({ ...s, run: value || undefined }))
+            setRunDialogStepIndex(null)
+          }}
+          onClose={() => setRunDialogStepIndex(null)}
+        />
       )}
     </aside>
   )
