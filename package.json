@@ -98,6 +98,12 @@
   },
   "dependencies": {
     "@actions/workflow-parser": "^0.3.30",
+    "@codemirror/commands": "^6.6.0",
+    "@codemirror/language": "^6.10.0",
+    "@codemirror/legacy-modes": "^6.4.0",
+    "@codemirror/state": "^6.4.0",
+    "@codemirror/theme-one-dark": "^6.1.2",
+    "@codemirror/view": "^6.23.0",
     "@xyflow/react": "^12.3.6",
     "react": "^18.3.1",
     "react-dom": "^18.3.1",

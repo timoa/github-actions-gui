@@ -3,3 +3,4 @@ ignoredBuiltDependencies:
 
 onlyBuiltDependencies:
   - '@vscode/vsce-sign'
+  - esbuild
