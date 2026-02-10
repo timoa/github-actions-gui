@@ -25,13 +25,13 @@ jobs:
       - name: Harden Runner
         uses: step-security/harden-runner@v2
         with:
-          egress-policy: block
-          allowed-endpoints: >
-            github.com:443
-            release-assets.githubusercontent.com:443
-            registry.npmjs.org:443
-            marketplace.visualstudio.com:443
-            open-vsx.org:443
+          egress-policy: audit
+          # allowed-endpoints: >
+          #   github.com:443
+          #   release-assets.githubusercontent.com:443
+          #   registry.npmjs.org:443
+          #   marketplace.visualstudio.com:443
+          #   open-vsx.org:443
 
       - name: Checkout for workflow_call (release)
         if: github.event_name == 'workflow_call'
