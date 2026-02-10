@@ -33,14 +33,14 @@ jobs:
           #   marketplace.visualstudio.com:443
           #   open-vsx.org:443
 
-      - name: Checkout (with ref when provided)
+      - name: Checkout with specific ref
         uses: actions/checkout@v6
         if: inputs.ref != ''
         with:
           fetch-depth: 0
           ref: ${{ inputs.ref }}
 
-      - name: Checkout (default ref)
+      - name: Checkout
         uses: actions/checkout@v6
         if: inputs.ref == ''
         with:
