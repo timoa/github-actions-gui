@@ -9,7 +9,7 @@ import {
   type OnSelectionChangeFunc,
 } from '@xyflow/react'
 import '@xyflow/react/dist/style.css'
-import { HiCog, HiFolderOpen, HiSave, HiTrash, HiCode } from 'react-icons/hi'
+import { HiCog, HiFolderOpen, HiTrash, HiCode } from 'react-icons/hi'
 import { AddJobNode } from './components/AddJobNode'
 import { JobNode } from './components/JobNode'
 import { JobPropertyPanel } from './components/JobPropertyPanel'
@@ -148,6 +148,21 @@ function AppInner() {
   // Validate workflow YAML whenever it changes (using official @actions/workflow-parser)
   useEffect(() => {
     if (workflow) {
+      const hasJobs = workflow.jobs && Object.keys(workflow.jobs).length > 0
+      const hasTriggers =
+        workflow.on &&
+        (typeof workflow.on === 'string' ||
+          (Array.isArray(workflow.on) && workflow.on.length > 0) ||
+          (typeof workflow.on === 'object' && Object.keys(workflow.on).length > 0))
+      const hasContent = hasJobs || hasTriggers
+
+      // Skip validation for an entirely empty workflow so that opening a brand-new
+      // (empty) file shows the onboarding UI without noisy validation errors.
+      if (!hasContent) {
+        setLintErrors([])
+        return
+      }
+
       const yaml = serializeWorkflow(workflow)
       const errors = validateWorkflowYaml(yaml)
       setLintErrors(errors)
@@ -478,16 +493,6 @@ function AppInner() {
         <div className="text-[11px] text-slate-400 dark:text-slate-500 font-medium">Workflow Editor</div>
         <div className="h-5 w-px bg-slate-200 dark:bg-slate-700" aria-hidden />
         <div className="flex items-center gap-2" role="group" aria-label="File">
-          <button
-            type="button"
-            onClick={handleSave}
-            disabled={!workflow || !hasJobs}
-            className="rounded border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-700 p-1.5 text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-600 disabled:opacity-50"
-            title="Save"
-            aria-label="Save"
-          >
-            <HiSave className="w-4 h-4" />
-          </button>
           <button
             type="button"
             onClick={() => setShowSourceDialog(true)}

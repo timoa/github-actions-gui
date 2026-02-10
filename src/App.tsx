@@ -104,6 +104,21 @@ function AppInner() {
   // Lint workflow whenever it changes
   useEffect(() => {
     if (workflow) {
+      const hasJobs = workflow.jobs && Object.keys(workflow.jobs).length > 0
+      const hasTriggers =
+        workflow.on &&
+        (typeof workflow.on === 'string' ||
+          (Array.isArray(workflow.on) && workflow.on.length > 0) ||
+          (typeof workflow.on === 'object' && Object.keys(workflow.on).length > 0))
+      const hasContent = hasJobs || hasTriggers
+
+      // Skip validation for an entirely empty workflow so that opening a brand-new
+      // (empty) file shows the onboarding UI without noisy validation errors.
+      if (!hasContent) {
+        setLintErrors([])
+        return
+      }
+
       const errors = validateWorkflowYaml(serializeWorkflow(workflow))
       setLintErrors(errors)
     } else {

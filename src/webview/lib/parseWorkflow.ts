@@ -13,6 +13,16 @@ export interface ParseResult {
 export function parseWorkflow(yamlContent: string): ParseResult {
   const errors: string[] = []
 
+  // Treat completely empty files as an empty workflow with no errors.
+  // This lets the onboarding UI handle creating the initial structure
+  // without showing validation noise for a brand-new file.
+  if (yamlContent.trim() === '') {
+    return {
+      workflow: { name: '', on: {}, jobs: {} },
+      errors: [],
+    }
+  }
+
   let parsed: unknown
   try {
     parsed = YAML.parse(yamlContent, { strict: false })

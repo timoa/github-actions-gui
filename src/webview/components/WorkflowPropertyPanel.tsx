@@ -105,8 +105,8 @@ export function WorkflowPropertyPanel({
             <p className="text-xs text-slate-500 dark:text-slate-400 italic">No environment variables configured</p>
           ) : (
             <div className="space-y-1.5">
-              {Object.entries(env).map(([key, value]) => (
-                <div key={key} className="flex items-center gap-1.5">
+              {Object.entries(env).map(([key, value], envIndex) => (
+                <div key={envIndex} className="flex items-center gap-1.5">
                   <input
                     type="text"
                     value={key}

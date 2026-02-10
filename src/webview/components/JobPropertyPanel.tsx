@@ -287,8 +287,8 @@ export function JobPropertyPanel({
             <p className="text-xs text-slate-500 dark:text-slate-400 italic">No environment variables configured</p>
           ) : (
             <div className="space-y-1.5">
-              {Object.entries(job.env).map(([key, value]) => (
-                <div key={key} className="flex items-center gap-1.5">
+              {Object.entries(job.env).map(([key, value], envIndex) => (
+                <div key={envIndex} className="flex items-center gap-1.5">
                   <input
                     type="text"
                     value={key}
@@ -356,12 +356,12 @@ export function JobPropertyPanel({
           {job.strategy?.matrix && (
             <div className="mb-3 rounded border border-slate-200 dark:border-slate-700 bg-slate-50 dark:bg-slate-700/50 p-2 space-y-2" data-matrix-dropdown>
               <div className="space-y-2">
-                {Object.entries(job.strategy.matrix).map(([key, values]) => {
+                {Object.entries(job.strategy.matrix).map(([key, values], matrixIndex) => {
                   const isCommonVar = isCommonMatrixVariable(key)
                   const predefinedValues = getMatrixVariableValues(key)
                   const isDropdownOpen = matrixVariableDropdowns[key] ?? false
                   return (
-                    <div key={key} className="rounded border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 p-2">
+                    <div key={matrixIndex} className="rounded border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 p-2">
                       <div className="flex items-center justify-between mb-1.5">
                         <div className="relative flex-1">
                           {isCommonVar ? (
