@@ -147,6 +147,37 @@ describe('triggersToOn', () => {
     ])
     expect(result).toEqual(['push', 'pull_request'])
   })
+
+  it('merges multiple non-schedule triggers with schedule into array format', () => {
+    const result = triggersToOn([
+      { event: 'push', config: {} },
+      { event: 'pull_request', config: { types: ['opened'] } },
+      { event: 'schedule', config: { cron: '0 0 * * *' } },
+    ])
+
+    expect(Array.isArray(result)).toBe(true)
+    const arr = result as unknown[]
+    expect(arr).toHaveLength(3)
+    expect(arr[0]).toBe('push')
+    expect(arr[1]).toEqual({ pull_request: { types: ['opened'] } })
+    expect(arr[2]).toEqual({
+      schedule: [{ cron: '0 0 * * *' }],
+    })
+  })
+
+  it('returns only schedule object when there are only schedule triggers', () => {
+    const result = triggersToOn([
+      { event: 'schedule', config: { cron: '0 0 * * *' } },
+      { event: 'schedule', config: { cron: '0 12 * * 1-5' } },
+    ])
+
+    expect(result).toEqual({
+      schedule: [
+        { cron: '0 0 * * *' },
+        { cron: '0 12 * * 1-5' },
+      ],
+    })
+  })
 })
 
 describe('triggerSupportsTypes', () => {

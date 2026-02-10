@@ -131,6 +131,26 @@ jobs:
     expect(workflow.jobs.good).toBeDefined()
     expect(workflow.jobs.bad).toBeUndefined()
   })
+
+  it('normalizes non-object steps into default step shape', () => {
+    const yaml = `
+name: Weird steps
+on: push
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - "just a string"
+      - 42
+      - {}
+`
+    const { workflow, errors } = parseWorkflow(yaml)
+    expect(errors).toEqual([])
+    const steps = workflow.jobs.build.steps
+    expect(steps[0]).toMatchObject({ name: 'Step 1', run: '' })
+    expect(steps[1]).toMatchObject({ name: 'Step 2', run: '' })
+    expect(steps[2]).toHaveProperty('run')
+  })
 })
 
 describe('serializeWorkflow', () => {
