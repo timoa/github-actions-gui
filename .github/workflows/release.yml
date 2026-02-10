@@ -16,6 +16,7 @@ jobs:
           allowed-endpoints: >
             github.com:443
             registry.npmjs.org:443
+            codecov.io:443
 
       - name: Checkout
         uses: actions/checkout@v6
@@ -49,8 +50,14 @@ jobs:
       - name: Lint
         run: pnpm lint
 
-      - name: Unit tests
-        run: pnpm test
+      - name: Unit tests with coverage
+        run: pnpm test:coverage
+
+      - name: Upload coverage to Codecov
+        uses: codecov/codecov-action@v4
+        with:
+          files: ./coverage/lcov.info
+          fail_ci_if_error: false
 
       - name: Build extension
         run: |
@@ -92,7 +99,7 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
   publish:
-    name: Publish Extension
+    name: Publish
     needs: release
     if: needs.release.outputs.new_release_published == 'true'
     uses: ./.github/workflows/publish.yml

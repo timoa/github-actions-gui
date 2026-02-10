@@ -27,7 +27,11 @@ jobs:
       - name: Harden Runner
         uses: step-security/harden-runner@v2
         with:
-          egress-policy: audit
+          egress-policy: block
+          allowed-endpoints: >
+            github.com:443
+            registry.npmjs.org:443
+            codecov.io:443
 
       - name: Checkout
         uses: actions/checkout@v6
@@ -74,6 +78,12 @@ jobs:
           echo "|--------|----------|" >> $GITHUB_STEP_SUMMARY
           echo "| **Lines** | ${LINES}% |" >> $GITHUB_STEP_SUMMARY
           echo "| **Statements** | ${STATEMENTS}% |" >> $GITHUB_STEP_SUMMARY
+
+      - name: Upload coverage to Codecov
+        uses: codecov/codecov-action@v4
+        with:
+          files: ./coverage/lcov.info
+          fail_ci_if_error: false
 
       - name: Build extension
         run: |

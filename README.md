@@ -1,5 +1,12 @@
 # Workflow Editor
 
+[![VS Code Marketplace Version](https://img.shields.io/visual-studio-marketplace/v/timoa.workflow-visual-editor)](https://marketplace.visualstudio.com/items?itemName=timoa.workflow-visual-editor)
+[![Coverage Status](https://codecov.io/gh/timoa/workflow-editor/branch/main/graph/badge.svg)](https://codecov.io/gh/timoa/workflow-editor)
+[![CI (Tests, Lint & Security)](https://github.com/timoa/workflow-editor/actions/workflows/pull-request.yml/badge.svg)](https://github.com/timoa/workflow-editor/actions/workflows/pull-request.yml)
+[![Release](https://github.com/timoa/workflow-editor/actions/workflows/release.yml/badge.svg)](https://github.com/timoa/workflow-editor/actions/workflows/release.yml)
+[![Publish](https://github.com/timoa/workflow-editor/actions/workflows/publish.yml/badge.svg)](https://github.com/timoa/workflow-editor/actions/workflows/publish.yml)
+[![License](https://img.shields.io/github/license/timoa/workflow-editor)](LICENSE)
+
 > **_WARNING:_** This extension is currently in heavy development and can have a few bugs. Please save your changes on Git before updating your Workflows
 
 A VSCode extension providing a visual editor for GitHub Actions workflow files. Open a workflow (YAML), view jobs and steps as a diagram, edit job properties in a side panel, and save back to YAML.
