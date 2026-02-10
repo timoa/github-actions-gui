@@ -6,7 +6,7 @@ on:
     inputs:
       ref:
         description: 'Git ref (branch, SHA or tag) to build from'
-        required: true
+        required: false
         type: string
   # Allow manual triggering
   workflow_dispatch:
@@ -33,16 +33,16 @@ jobs:
           #   marketplace.visualstudio.com:443
           #   open-vsx.org:443
 
-      - name: Checkout for workflow_call (release)
-        if: github.event_name == 'workflow_call'
+      - name: Checkout (with ref when provided)
         uses: actions/checkout@v6
+        if: inputs.ref != ''
         with:
           fetch-depth: 0
           ref: ${{ inputs.ref }}
 
-      - name: Checkout for manual run
-        if: github.event_name == 'workflow_dispatch'
+      - name: Checkout (default ref)
         uses: actions/checkout@v6
+        if: inputs.ref == ''
         with:
           fetch-depth: 0
 
