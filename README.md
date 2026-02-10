@@ -130,6 +130,31 @@ On every pull request to `main` or `master`, GitHub Actions runs:
 
 Workflow file: [.github/workflows/pull-request.yml](.github/workflows/pull-request.yml). Runs only when relevant files (e.g. `src/`, configs, `package.json`, lockfile) change.
 
+## Security
+
+### GitHub Actions Security with Harden Runner
+
+All GitHub Actions workflows are secured using [step-security/harden-runner](https://github.com/step-security/harden-runner), a security agent that monitors and protects CI/CD pipelines.
+
+**What it does:**
+- Monitors network egress to detect unauthorized outbound calls
+- Tracks file integrity to detect tampering
+- Monitors process activity for suspicious behavior
+- Auto-detects GitHub Actions cache endpoints
+
+**Current Configuration:**
+All workflows run in **audit mode**, which monitors and logs all activity without blocking. This allows us to:
+1. Review which network endpoints are accessed during workflow runs
+2. Identify any suspicious or unexpected network activity
+3. Build a policy of allowed endpoints for future enforcement
+
+**Workflows Protected:**
+- [.github/workflows/pull-request.yml](.github/workflows/pull-request.yml) - CI checks
+- [.github/workflows/release.yml](.github/workflows/release.yml) - Release automation
+- [.github/workflows/publish.yml](.github/workflows/publish.yml) - Marketplace publishing
+
+Audit results and insights are available at the [Step Security dashboard](https://app.stepsecurity.io/).
+
 ## Release & Publishing
 
 ### Automated Release
