@@ -4,7 +4,7 @@ import {
   ReactFlow,
   Background,
   Controls,
-  MiniMap,
+  // MiniMap,
   ReactFlowProvider,
   type Node,
   type OnSelectionChangeFunc,
@@ -630,7 +630,7 @@ function AppInner() {
             >
               <Background />
               <Controls />
-              <MiniMap />
+              {/* <MiniMap /> */}
             </ReactFlow>
           ) : (
             <div className="absolute inset-0 flex flex-col items-center justify-center bg-slate-50 dark:bg-slate-900 gap-4">
