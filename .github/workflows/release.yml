@@ -12,7 +12,10 @@ jobs:
       - name: Harden Runner
         uses: step-security/harden-runner@v2
         with:
-          egress-policy: audit
+          egress-policy: block
+          allowed-endpoints: >
+            github.com:443
+            registry.npmjs.org:443
 
       - name: Checkout
         uses: actions/checkout@v6
@@ -60,6 +63,9 @@ jobs:
     needs: test
     permissions:
       contents: write
+    outputs:
+      new_release_published: ${{ steps.semantic-release.outputs.new_release_published }}
+      new_release_version: ${{ steps.semantic-release.outputs.new_release_version }}
     steps:
       - name: Harden Runner
         uses: step-security/harden-runner@v2
@@ -73,6 +79,7 @@ jobs:
           persist-credentials: true
 
       - name: Release
+        id: semantic-release
         uses: cycjimmy/semantic-release-action@v4
         with:
           semantic_version: 24
@@ -83,3 +90,10 @@ jobs:
             @semantic-release/github@9
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+  publish:
+    name: Publish Extension
+    needs: release
+    if: needs.release.outputs.new_release_published == 'true'
+    uses: ./.github/workflows/publish.yml
+    secrets: inherit

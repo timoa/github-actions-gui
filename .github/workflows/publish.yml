@@ -1,9 +1,8 @@
 name: Publish Extension
 
 on:
-  # Trigger when a GitHub release is published (created by Semantic Release)
-  release:
-    types: [published, created]
+  # Trigger when called by the Release workflow after Semantic Release creates a new release
+  workflow_call:
   # Allow manual triggering
   workflow_dispatch:
     inputs:
@@ -21,7 +20,13 @@ jobs:
       - name: Harden Runner
         uses: step-security/harden-runner@v2
         with:
-          egress-policy: audit
+          egress-policy: block
+          allowed-endpoints: >
+            github.com:443
+            release-assets.githubusercontent.com:443
+            registry.npmjs.org:443
+            marketplace.visualstudio.com:443
+            open-vsx.org:443
 
       - name: Checkout
         uses: actions/checkout@v6
@@ -78,19 +83,17 @@ jobs:
           echo "tag=$(git describe --tags --abbrev=0)" >> $GITHUB_OUTPUT
 
       - name: Upload VSIX to GitHub Release
-        # Only upload to release when triggered by a release event (not manual workflow_dispatch)
-        if: github.event_name == 'release'
+        # Only upload to release when called by the Release workflow (not manual workflow_dispatch)
+        if: github.event_name == 'workflow_call'
         uses: softprops/action-gh-release@v2
         with:
           files: ${{ steps.vsix.outputs.filename }}
-          tag_name: ${{ github.event.release.tag_name }}
+          tag_name: ${{ steps.vsix.outputs.tag }}
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Publish to VS Code Marketplace
         id: publish-vscode
-        # Publish when triggered by release event or manual workflow_dispatch
-        if: github.event_name == 'release' || github.event_name == 'workflow_dispatch'
         continue-on-error: true
         run: pnpm run publish
         env:
@@ -98,15 +101,12 @@ jobs:
 
       - name: Publish to Open VSX Registry
         id: publish-ovsx
-        # Publish when triggered by release event or manual workflow_dispatch
-        if: github.event_name == 'release' || github.event_name == 'workflow_dispatch'
         continue-on-error: true
         run: npx ovsx publish *.vsix -p $OVSX_PAT
         env:
           OVSX_PAT: ${{ secrets.OVSX_PAT }}
 
       - name: Report publish status
-        if: github.event_name == 'release' || github.event_name == 'workflow_dispatch'
         run: |
           echo "## Publish Status" >> $GITHUB_STEP_SUMMARY
           echo "" >> $GITHUB_STEP_SUMMARY
