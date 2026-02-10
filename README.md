@@ -1,6 +1,5 @@
 # Workflow Editor
 
-[![VS Code Marketplace Version](https://img.shields.io/visual-studio-marketplace/v/timoa.workflow-visual-editor)](https://marketplace.visualstudio.com/items?itemName=timoa.workflow-visual-editor)
 [![Coverage Status](https://codecov.io/gh/timoa/workflow-editor/branch/main/graph/badge.svg)](https://codecov.io/gh/timoa/workflow-editor)
 [![CI (Tests, Lint & Security)](https://github.com/timoa/workflow-editor/actions/workflows/pull-request.yml/badge.svg)](https://github.com/timoa/workflow-editor/actions/workflows/pull-request.yml)
 [![Release](https://github.com/timoa/workflow-editor/actions/workflows/release.yml/badge.svg)](https://github.com/timoa/workflow-editor/actions/workflows/release.yml)
