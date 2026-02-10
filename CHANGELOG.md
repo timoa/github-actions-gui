@@ -1,3 +1,10 @@
+## [1.2.17](https://github.com/timoa/workflow-editor/compare/v1.2.16...v1.2.17) (2026-02-10)
+
+
+### Bug Fixes
+
+* **ui:** deactivate the React Flow Minimap to have more space ([585a55a](https://github.com/timoa/workflow-editor/commit/585a55a09db666ae5bc5bf8241957d7d0295ffe6))
+
 ## [1.2.16](https://github.com/timoa/workflow-editor/compare/v1.2.15...v1.2.16) (2026-02-10)
 
 
