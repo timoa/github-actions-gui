@@ -1,3 +1,10 @@
+## [1.2.16](https://github.com/timoa/workflow-editor/compare/v1.2.15...v1.2.16) (2026-02-10)
+
+
+### Bug Fixes
+
+* **jobs:** improve the UI for the "Run" textarea ([699d3d0](https://github.com/timoa/workflow-editor/commit/699d3d0c3fe2363e718d32b6f7e0db5814a5069e))
+
 ## [1.2.15](https://github.com/timoa/workflow-editor/compare/v1.2.14...v1.2.15) (2026-02-09)
 
 
