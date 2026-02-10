@@ -1,3 +1,10 @@
+## [1.2.18](https://github.com/timoa/workflow-editor/compare/v1.2.17...v1.2.18) (2026-02-10)
+
+
+### Bug Fixes
+
+* **extension:** add CHANGELOG.md to the extension bundle + fix the publish workflow trigger ([6b66ea5](https://github.com/timoa/workflow-editor/commit/6b66ea56cde12f67529efd7dbd7a89248d0d685a))
+
 ## [1.2.17](https://github.com/timoa/workflow-editor/compare/v1.2.16...v1.2.17) (2026-02-10)
 
 
