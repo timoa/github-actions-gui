@@ -12,11 +12,7 @@ jobs:
       - name: Harden Runner
         uses: step-security/harden-runner@v2
         with:
-          egress-policy: block
-          allowed-endpoints: >
-            github.com:443
-            registry.npmjs.org:443
-            codecov.io:443
+          egress-policy: audit
 
       - name: Checkout
         uses: actions/checkout@v6
