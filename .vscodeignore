@@ -21,6 +21,7 @@ docs/**
 .cursor/**
 *.md
 !README.md
+!CHANGELOG.md
 *.test.ts
 *.test.tsx
 node_modules/**
