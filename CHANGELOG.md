@@ -1,3 +1,11 @@
+## [1.2.19](https://github.com/timoa/workflow-editor/compare/v1.2.18...v1.2.19) (2026-02-10)
+
+
+### Bug Fixes
+
+* **jobs:** fix a few UI/UX bugs ([8ee1bd8](https://github.com/timoa/workflow-editor/commit/8ee1bd8af3934597c50973102c32e54c7e516a85))
+* **vscode:** remove the settings.json file from the repo ([eef16b3](https://github.com/timoa/workflow-editor/commit/eef16b3e072e5875d5d326fcb204812b1e5e5a86))
+
 ## [1.2.18](https://github.com/timoa/workflow-editor/compare/v1.2.17...v1.2.18) (2026-02-10)
 
 
