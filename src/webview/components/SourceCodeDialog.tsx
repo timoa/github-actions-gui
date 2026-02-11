@@ -13,6 +13,7 @@ import type { Workflow } from '@/types/workflow'
 
 interface SourceCodeDialogProps {
   initialYaml: string
+  filename?: string
   onClose: () => void
   onSave: (workflow: Workflow, errors: string[]) => void
 }
@@ -26,6 +27,7 @@ function getEditorTheme() {
 
 export function SourceCodeDialog({
   initialYaml,
+  filename = 'workflow.yml',
   onClose,
   onSave,
 }: SourceCodeDialogProps) {
@@ -120,7 +122,7 @@ export function SourceCodeDialog({
       setSyntaxCheckValid(false)
       return
     }
-    const lintErrs = validateWorkflowYaml(yamlContent)
+    const lintErrs = validateWorkflowYaml(yamlContent, filename)
     setLintErrors(lintErrs)
     onSave(workflow, errors)
     onClose()
@@ -139,7 +141,7 @@ export function SourceCodeDialog({
       setSyntaxCheckValid(false)
       return
     }
-    const lintErrs = validateWorkflowYaml(yamlContent)
+    const lintErrs = validateWorkflowYaml(yamlContent, filename)
     setLintErrors(lintErrs)
     setSyntaxCheckValid(lintErrs.length === 0)
   }

@@ -89,13 +89,14 @@ function AppInner() {
   // Listen for file load events from VSCode
   useEffect(() => {
     const handleLoadFile = (event: CustomEvent<{ content: string; filename: string }>) => {
-      const { content } = event.detail
+      const { content, filename } = event.detail
       const { workflow: w, errors } = openWorkflowFromYaml(content)
       undoStackRef.current = []
       setIsEditingWorkflowName(false)
       isUpdatingWorkflowRef.current = true
       setWorkflow(w)
       setParseErrors(errors)
+      setCurrentFilename(filename || 'workflow.yml')
       if (selectedJobId && w.jobs[selectedJobId]) {
         // Keep selection
       } else {
@@ -141,6 +142,7 @@ function AppInner() {
   const [isEditingWorkflowName, setIsEditingWorkflowName] = useState(false)
   const [deleteJobId, setDeleteJobId] = useState<string | null>(null)
   const [deleteJobMessage, setDeleteJobMessage] = useState<string>('')
+  const [currentFilename, setCurrentFilename] = useState<string>('workflow.yml')
   const workflowNameInputRef = useRef<HTMLInputElement>(null)
   const isUpdatingWorkflowRef = useRef(false)
 
@@ -167,12 +169,12 @@ function AppInner() {
       }
 
       const yaml = serializeWorkflow(workflow)
-      const errors = validateWorkflowYaml(yaml)
+      const errors = validateWorkflowYaml(yaml, currentFilename)
       setLintErrors(errors)
     } else {
       setLintErrors([])
     }
-  }, [workflow])
+  }, [workflow, currentFilename])
 
   const handleRequestDeleteJob = useCallback(
     (jobId: string) => {
@@ -467,6 +469,7 @@ function AppInner() {
       {showSourceDialog && workflow && (
         <SourceCodeDialog
           initialYaml={serializeWorkflow(workflow)}
+          filename={currentFilename}
           onClose={() => setShowSourceDialog(false)}
           onSave={(w, errors) => {
             pushUndoState(workflow)
