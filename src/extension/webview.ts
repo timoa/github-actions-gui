@@ -31,7 +31,10 @@ export class WorkflowEditorProvider {
       column || vscode.ViewColumn.One,
       {
         enableScripts: true,
-        localResourceRoots: [vscode.Uri.joinPath(extensionUri, 'media')],
+        localResourceRoots: [
+          vscode.Uri.joinPath(extensionUri, 'media'),
+          vscode.Uri.joinPath(extensionUri, 'images'),
+        ],
         retainContextWhenHidden: true,
       }
     );
@@ -213,6 +216,11 @@ export class WorkflowEditorProvider {
       vscode.Uri.joinPath(this._extensionUri, 'media', 'main.css')
     );
 
+    // Get the icon URI
+    const iconUri = webview.asWebviewUri(
+      vscode.Uri.joinPath(this._extensionUri, 'images', 'icon.svg')
+    );
+
     // Use a nonce to only allow a specific script to be run.
     const nonce = getNonce();
 
@@ -220,7 +228,7 @@ export class WorkflowEditorProvider {
 			<html lang="en">
 			<head>
 				<meta charset="UTF-8">
-				<meta http-equiv="Content-Security-Policy" content="default-src 'none'; style-src ${webview.cspSource} 'unsafe-inline'; script-src 'nonce-${nonce}';">
+				<meta http-equiv="Content-Security-Policy" content="default-src 'none'; style-src ${webview.cspSource} 'unsafe-inline'; script-src 'nonce-${nonce}'; img-src ${webview.cspSource} data:;">
 				<meta name="viewport" content="width=device-width, initial-scale=1.0">
 				<link href="${styleUri}" rel="stylesheet">
 				<title>Workflow Editor</title>
@@ -231,6 +239,7 @@ export class WorkflowEditorProvider {
 					try {
 						const vscode = acquireVsCodeApi();
 						window.vscode = vscode;
+						window.workflowEditorIconUri = "${iconUri.toString()}";
 					} catch (error) {
 						console.error('Failed to acquire VSCode API:', error);
 					}

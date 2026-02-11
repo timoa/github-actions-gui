@@ -1061,9 +1061,6 @@ video {
 .font-mono {
   font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
 }
-.text-\[11px\] {
-  font-size: 11px;
-}
 .text-lg {
   font-size: 1.125rem;
   line-height: 1.75rem;

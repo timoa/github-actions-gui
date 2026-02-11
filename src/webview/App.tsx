@@ -9,7 +9,8 @@ import {
   type OnSelectionChangeFunc,
 } from '@xyflow/react'
 import '@xyflow/react/dist/style.css'
-import { HiCog, HiFolderOpen, HiTrash, HiCode } from 'react-icons/hi'
+import { HiCog, HiFolderOpen, HiCode } from 'react-icons/hi'
+import { FaBroom, FaBug } from 'react-icons/fa'
 import { AddJobNode } from './components/AddJobNode'
 import { JobNode } from './components/JobNode'
 import { JobPropertyPanel } from './components/JobPropertyPanel'
@@ -58,7 +59,7 @@ function AppInner() {
   const [selectedJobId, setSelectedJobId] = useState<string | null>(null)
   const undoStackRef = useRef<Workflow[]>([])
 
-  // Listen for VSCode theme changes
+  // Listen for VSCode theme changes and get icon URI
   useEffect(() => {
     const handleThemeChange = (event: CustomEvent<{ theme: 'light' | 'dark' }>) => {
       const newTheme = event.detail.theme
@@ -71,7 +72,17 @@ function AppInner() {
       }
     }
 
+    const handleIconUri = (event: CustomEvent<{ uri: string }>) => {
+      setIconUri(event.detail.uri)
+    }
+
+    // Get icon URI from window variable set in HTML
+    if (window.workflowEditorIconUri) {
+      setIconUri(window.workflowEditorIconUri)
+    }
+
     window.addEventListener('vscode-themeChanged', handleThemeChange as EventListener)
+    window.addEventListener('vscode-iconUri', handleIconUri as EventListener)
     
     // Request initial theme
     const vscodeApi = getVscode()
@@ -83,6 +94,7 @@ function AppInner() {
 
     return () => {
       window.removeEventListener('vscode-themeChanged', handleThemeChange as EventListener)
+      window.removeEventListener('vscode-iconUri', handleIconUri as EventListener)
     }
   }, [])
 
@@ -143,6 +155,7 @@ function AppInner() {
   const [deleteJobId, setDeleteJobId] = useState<string | null>(null)
   const [deleteJobMessage, setDeleteJobMessage] = useState<string>('')
   const [currentFilename, setCurrentFilename] = useState<string>('workflow.yml')
+  const [iconUri, setIconUri] = useState<string | null>(null)
   const workflowNameInputRef = useRef<HTMLInputElement>(null)
   const isUpdatingWorkflowRef = useRef(false)
 
@@ -492,6 +505,13 @@ function AppInner() {
       )}
       <header className="flex flex-wrap items-center gap-2 border-b border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 px-2 py-1 shadow-sm text-xs">
         <div className="flex items-center gap-2 flex-1 min-w-0">
+          {iconUri && (
+            <img
+              src={iconUri}
+              alt="Workflow Editor"
+              className="w-5 h-5 flex-shrink-0"
+            />
+          )}
           {workflow ? (
             isEditingWorkflowName ? (
               <input
@@ -517,34 +537,6 @@ function AppInner() {
             <h1 className="text-xs font-semibold text-slate-400 dark:text-slate-500">No workflow loaded</h1>
           )}
         </div>
-        <div className="text-[11px] text-slate-400 dark:text-slate-500 font-medium">Workflow Editor</div>
-        <div className="h-5 w-px bg-slate-200 dark:bg-slate-700" aria-hidden />
-        <div className="flex items-center gap-2" role="group" aria-label="File">
-          <button
-            type="button"
-            onClick={() => setShowSourceDialog(true)}
-            disabled={!workflow}
-            className="rounded border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-700 p-1.5 text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-600 disabled:opacity-50"
-            title="View source"
-            aria-label="View source"
-          >
-            <HiCode className="w-4 h-4" />
-          </button>
-          <button
-            type="button"
-            onClick={() => {
-              if (workflow) pushUndoState(workflow)
-              setIsEditingWorkflowName(false)
-              setWorkflow(workflow ? null : sampleWorkflow)
-            }}
-            className="rounded border border-slate-300 dark:border-slate-600 bg-white dark:bg-slate-700 p-1.5 text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-600"
-            title={workflow ? 'Clear' : 'Load sample'}
-            aria-label={workflow ? 'Clear' : 'Load sample'}
-          >
-            {workflow ? <HiTrash className="w-4 h-4" /> : <HiFolderOpen className="w-4 h-4" />}
-          </button>
-        </div>
-        <div className="h-5 w-px bg-slate-200" aria-hidden />
         <div className="flex items-center gap-2" role="group" aria-label="Editor">
           <button
             type="button"
@@ -559,6 +551,32 @@ function AppInner() {
             className="rounded border border-blue-300 dark:border-blue-600 bg-blue-50 dark:bg-blue-900/30 px-1.5 py-0.5 text-xs font-medium text-blue-700 dark:text-blue-300 hover:bg-blue-100 dark:hover:bg-blue-900/50"
           >
             + Add Job
+          </button>
+        </div>
+        <div className="h-5 w-px bg-slate-200 dark:bg-slate-700" aria-hidden />
+        <div className="flex items-center gap-2" role="group" aria-label="File">
+          <button
+            type="button"
+            onClick={() => setShowSourceDialog(true)}
+            disabled={!workflow}
+            className="rounded p-1.5 disabled:opacity-50 text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700"
+            title="View source"
+            aria-label="View source"
+          >
+            <HiCode className="w-4 h-4" />
+          </button>
+          <button
+            type="button"
+            onClick={() => {
+              if (workflow) pushUndoState(workflow)
+              setIsEditingWorkflowName(false)
+              setWorkflow(workflow ? null : sampleWorkflow)
+            }}
+            className="rounded p-1.5 text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700"
+            title={workflow ? 'Clear' : 'Load sample'}
+            aria-label={workflow ? 'Clear' : 'Load sample'}
+          >
+            {workflow ? <FaBroom className="w-4 h-4" /> : <HiFolderOpen className="w-4 h-4" />}
           </button>
         </div>
         <div className="ml-auto flex items-center gap-2">
@@ -576,6 +594,16 @@ function AppInner() {
           >
             <HiCog className="w-4 h-4" />
           </button>
+          <a
+            href="https://github.com/timoa/workflow-editor/issues"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="rounded p-1.5 text-slate-600 dark:text-slate-300 hover:bg-slate-100 dark:hover:bg-slate-700"
+            title="Report a bug or request a feature"
+            aria-label="GitHub Issues"
+          >
+            <FaBug className="w-4 h-4" />
+          </a>
         </div>
       </header>
       {(parseErrors.length > 0 || lintErrors.length > 0) && (
