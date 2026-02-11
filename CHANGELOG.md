@@ -1,3 +1,13 @@
+## [1.2.20](https://github.com/timoa/workflow-editor/compare/v1.2.19...v1.2.20) (2026-02-11)
+
+
+### Bug Fixes
+
+* **jobs:** fix the confirmDialog that was not opening when deleting a job ([b1097c6](https://github.com/timoa/workflow-editor/commit/b1097c6eaeb14d1480a2ccbdb1c75c8dad7ad75b))
+* **ui:** add line numbers to the "run" dialog editor ([4b1fdcb](https://github.com/timoa/workflow-editor/commit/4b1fdcb5a55934879c72676fc5d682f88605e83a))
+* **ui:** add the line number in the source code editor ([21e2739](https://github.com/timoa/workflow-editor/commit/21e273991f4ee9041064dfc585ca9a4aa32c8e72))
+* **ui:** show the exact filename in the linter instead of "workflow.yml" ([e20081f](https://github.com/timoa/workflow-editor/commit/e20081f9ddc9196f847afb60ace7a5081373edf5))
+
 ## [1.2.19](https://github.com/timoa/workflow-editor/compare/v1.2.18...v1.2.19) (2026-02-10)
 
 
