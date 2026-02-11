@@ -1,5 +1,5 @@
 import { useEffect, useRef } from 'react'
-import { EditorView, keymap } from '@codemirror/view'
+import { EditorView, keymap, lineNumbers } from '@codemirror/view'
 import { EditorState } from '@codemirror/state'
 import { defaultKeymap } from '@codemirror/commands'
 import { StreamLanguage } from '@codemirror/language'
@@ -53,6 +53,17 @@ export function RunScriptDialog({
         fontSize: '0.875rem',
         padding: '1rem',
       },
+      '.cm-lineNumbers': {
+        fontFamily: 'ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, monospace',
+        fontSize: '0.875rem',
+        minWidth: '3ch',
+        paddingRight: '1rem',
+        textAlign: 'right',
+      },
+      '.cm-lineNumbers .cm-gutterElement': {
+        paddingLeft: '0.5rem',
+        paddingRight: '0.5rem',
+      },
     })
 
     const state = EditorState.create({
@@ -60,6 +71,7 @@ export function RunScriptDialog({
       extensions: [
         shellLanguage,
         ...getEditorTheme(),
+        lineNumbers(),
         keymap.of(defaultKeymap),
         theme,
       ],

@@ -624,7 +624,7 @@ function AppInner() {
         </div>
       )}
       <main className="flex-1 overflow-hidden flex" role="main" aria-label="Workflow diagram">
-        <div className="flex-1 relative">
+        <div className="flex-1 relative min-w-0">
           {hasContent ? (
             <ReactFlow
               key={workflow ? `flow-on-${JSON.stringify(workflow.on)}` : 'flow'}
