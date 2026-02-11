@@ -1,3 +1,10 @@
+## [1.2.21](https://github.com/timoa/workflow-editor/compare/v1.2.20...v1.2.21) (2026-02-11)
+
+
+### Bug Fixes
+
+* **ui:** add new logo + refactor the navbar buttons ([0ae8d2a](https://github.com/timoa/workflow-editor/commit/0ae8d2adb9c9bb29a15f90e69d8f6a7fb1788303))
+
 ## [1.2.20](https://github.com/timoa/workflow-editor/compare/v1.2.19...v1.2.20) (2026-02-11)
 
 
