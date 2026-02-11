@@ -10,7 +10,7 @@
 
 A VSCode extension providing a visual editor for GitHub Actions workflow files. Open a workflow (YAML), view jobs and steps as a diagram, edit job properties in a side panel, and save back to YAML.
 
-![Workflow Editor screenshot](https://workflow-editor.com/images/visual-editor-hero.webp)
+![Workflow Editor demo](https://workflow-editor.com/images/demo/workflow-editor-demo.gif)
 
 ## Features
 
