@@ -17,6 +17,7 @@ import { TriggerNode } from './components/TriggerNode'
 import { TriggerPropertyPanel } from './components/TriggerPropertyPanel'
 import { WorkflowPropertyPanel } from './components/WorkflowPropertyPanel'
 import { SourceCodeDialog } from './components/SourceCodeDialog'
+import { ConfirmDialog } from './components/ConfirmDialog'
 import { openWorkflowFromYaml, saveWorkflowToFile, getVscode } from './lib/fileHandling'
 import { serializeWorkflow } from './lib/serializeWorkflow'
 import { parseTriggers, triggersToOn } from './lib/triggerUtils'
@@ -138,6 +139,8 @@ function AppInner() {
   const [lintErrors, setLintErrors] = useState<LintError[]>([])
   const [showSourceDialog, setShowSourceDialog] = useState(false)
   const [isEditingWorkflowName, setIsEditingWorkflowName] = useState(false)
+  const [deleteJobId, setDeleteJobId] = useState<string | null>(null)
+  const [deleteJobMessage, setDeleteJobMessage] = useState<string>('')
   const workflowNameInputRef = useRef<HTMLInputElement>(null)
   const isUpdatingWorkflowRef = useRef(false)
 
@@ -176,32 +179,46 @@ function AppInner() {
       if (!workflow?.jobs[jobId]) return
       const jobName = workflow.jobs[jobId].name || jobId
       const message = `Are you sure you want to delete the job "${jobName}"? This cannot be undone.`
-      if (!window.confirm(message)) return
-      pushUndoState(workflow)
-      const nextJobs = { ...workflow.jobs }
-      delete nextJobs[jobId]
-      for (const id of Object.keys(nextJobs)) {
-        const job = nextJobs[id]
-        if (job.needs) {
-          const needs = Array.isArray(job.needs) ? job.needs : [job.needs]
-          const filtered = needs.filter((n) => n !== jobId)
-          if (filtered.length !== needs.length) {
-            nextJobs[id] = {
-              ...job,
-              needs: filtered.length === 0 ? undefined : filtered.length === 1 ? filtered[0] : filtered,
-            }
+      setDeleteJobMessage(message)
+      setDeleteJobId(jobId)
+    },
+    [workflow]
+  )
+
+  const handleConfirmDeleteJob = useCallback(() => {
+    if (!deleteJobId || !workflow?.jobs[deleteJobId]) {
+      setDeleteJobId(null)
+      return
+    }
+    pushUndoState(workflow)
+    const nextJobs = { ...workflow.jobs }
+    delete nextJobs[deleteJobId]
+    for (const id of Object.keys(nextJobs)) {
+      const job = nextJobs[id]
+      if (job.needs) {
+        const needs = Array.isArray(job.needs) ? job.needs : [job.needs]
+        const filtered = needs.filter((n) => n !== deleteJobId)
+        if (filtered.length !== needs.length) {
+          nextJobs[id] = {
+            ...job,
+            needs: filtered.length === 0 ? undefined : filtered.length === 1 ? filtered[0] : filtered,
           }
         }
       }
-      isUpdatingWorkflowRef.current = true
-      setWorkflow({ ...workflow, jobs: nextJobs })
-      setSelectedJobId(null)
-      setTimeout(() => {
-        isUpdatingWorkflowRef.current = false
-      }, 100)
-    },
-    [workflow, pushUndoState]
-  )
+    }
+    isUpdatingWorkflowRef.current = true
+    setWorkflow({ ...workflow, jobs: nextJobs })
+    setSelectedJobId(null)
+    setDeleteJobId(null)
+    setTimeout(() => {
+      isUpdatingWorkflowRef.current = false
+    }, 100)
+  }, [deleteJobId, workflow, pushUndoState])
+
+  const handleCancelDeleteJob = useCallback(() => {
+    setDeleteJobId(null)
+    setDeleteJobMessage('')
+  }, [])
 
   const nodes = useMemo(() => {
     return baseNodes.map((node) => {
@@ -461,6 +478,13 @@ function AppInner() {
               isUpdatingWorkflowRef.current = false
             }, 100)
           }}
+        />
+      )}
+      {deleteJobId && (
+        <ConfirmDialog
+          message={deleteJobMessage}
+          onConfirm={handleConfirmDeleteJob}
+          onCancel={handleCancelDeleteJob}
         />
       )}
       <header className="flex flex-wrap items-center gap-2 border-b border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 px-2 py-1 shadow-sm text-xs">

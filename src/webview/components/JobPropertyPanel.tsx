@@ -861,11 +861,25 @@ className={`w-full px-1.5 py-1 text-xs text-left hover:bg-slate-50 dark:hover:bg
         </div>
       </div>
       {onDeleteJob && (
-        <div className="flex justify-center border-t border-slate-200 dark:border-slate-700 p-4">
+        <div 
+          className="flex justify-center border-t border-slate-200 dark:border-slate-700 p-4"
+          onClick={(e) => e.stopPropagation()}
+          onMouseDown={(e) => e.stopPropagation()}
+        >
           <button
             type="button"
-            onClick={() => onDeleteJob(jobId)}
-            className="rounded border border-red-200 dark:border-red-800 bg-white dark:bg-slate-800 px-3 py-1.5 text-xs font-medium text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/30"
+            onClick={(e) => {
+              e.preventDefault()
+              e.stopPropagation()
+              if (onDeleteJob) {
+                onDeleteJob(jobId)
+              }
+            }}
+            onMouseDown={(e) => {
+              e.preventDefault()
+              e.stopPropagation()
+            }}
+            className="rounded border border-red-200 dark:border-red-800 bg-white dark:bg-slate-800 px-3 py-1.5 text-xs font-medium text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-red-900/30 cursor-pointer"
             aria-label={`Delete job ${jobId}`}
           >
             Delete job
