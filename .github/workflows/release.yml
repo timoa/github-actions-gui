@@ -81,7 +81,7 @@ jobs:
         uses: actions/checkout@v6
         with:
           fetch-depth: 0
-          persist-credentials: true
+          persist-credentials: false
 
       - name: Generate GitHub App token
         id: app-token
@@ -89,6 +89,12 @@ jobs:
         with:
           app-id: ${{ vars.TIMOA_BOT_APP_ID }}
           private-key: ${{ secrets.TIMOA_BOT_PRIVATE_KEY }}
+
+      - name: Configure git to use GitHub App token for push
+        run: |
+          git config --global url."https://x-access-token:${GH_TOKEN}@github.com/".insteadOf "https://github.com/"
+        env:
+          GH_TOKEN: ${{ steps.app-token.outputs.token }}
 
       - name: Release
         id: semantic-release
