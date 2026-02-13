@@ -72,17 +72,7 @@ function AppInner() {
       }
     }
 
-    const handleIconUri = (event: CustomEvent<{ uri: string }>) => {
-      setIconUri(event.detail.uri)
-    }
-
-    // Get icon URI from window variable set in HTML
-    if (window.workflowEditorIconUri) {
-      setIconUri(window.workflowEditorIconUri)
-    }
-
     window.addEventListener('vscode-themeChanged', handleThemeChange as EventListener)
-    window.addEventListener('vscode-iconUri', handleIconUri as EventListener)
     
     // Request initial theme
     const vscodeApi = getVscode()
@@ -94,7 +84,6 @@ function AppInner() {
 
     return () => {
       window.removeEventListener('vscode-themeChanged', handleThemeChange as EventListener)
-      window.removeEventListener('vscode-iconUri', handleIconUri as EventListener)
     }
   }, [])
 
@@ -161,7 +150,6 @@ function AppInner() {
   const [deleteJobId, setDeleteJobId] = useState<string | null>(null)
   const [deleteJobMessage, setDeleteJobMessage] = useState<string>('')
   const [currentFilename, setCurrentFilename] = useState<string>('workflow.yml')
-  const [iconUri, setIconUri] = useState<string | null>(null)
   const workflowNameInputRef = useRef<HTMLInputElement>(null)
   const isUpdatingWorkflowRef = useRef(false)
 
@@ -511,13 +499,6 @@ function AppInner() {
       )}
       <header className="flex flex-wrap items-center gap-2 border-b border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 px-2 py-1 shadow-sm text-xs">
         <div className="flex items-center gap-2 flex-1 min-w-0">
-          {iconUri && (
-            <img
-              src={iconUri}
-              alt="Workflow Editor"
-              className="w-5 h-5 flex-shrink-0"
-            />
-          )}
           {workflow ? (
             isEditingWorkflowName ? (
               <input

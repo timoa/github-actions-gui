@@ -4,28 +4,45 @@ import * as path from 'node:path';
 export class WorkflowEditorProvider {
   public static readonly viewType = 'workflowEditor';
 
-  private static _instance: WorkflowEditorProvider | undefined;
+  /** All open workflow editor panels (one per tab). */
+  private static _instances: Set<WorkflowEditorProvider> = new Set();
+  /** The panel that currently has focus (for Save/Undo commands). */
+  private static _activeInstance: WorkflowEditorProvider | undefined;
 
   private readonly _panel: vscode.WebviewPanel;
   private readonly _extensionUri: vscode.Uri;
   private _disposables: vscode.Disposable[] = [];
 
-  public static createOrShow(extensionUri: vscode.Uri, fileToLoad?: vscode.Uri): WorkflowEditorProvider {
+  /**
+   * Create a new panel or reveal an existing one for the given file.
+   * When fileToLoad is provided and a panel already exists for that URI, that panel is revealed.
+   * Otherwise a new panel is created so the user does not lose unsaved changes in the current tab.
+   */
+  public static async createOrShow(extensionUri: vscode.Uri, fileToLoad?: vscode.Uri): Promise<WorkflowEditorProvider> {
     const column = vscode.window.activeTextEditor
       ? vscode.window.activeTextEditor.viewColumn
       : undefined;
 
-    // If we already have a panel, show it
-    // Note: Caller should call loadFile() explicitly to load the file
-    if (WorkflowEditorProvider._instance) {
-      WorkflowEditorProvider._instance._panel.reveal(column);
-      return WorkflowEditorProvider._instance;
+    if (fileToLoad) {
+      const existing = WorkflowEditorProvider._findByUri(fileToLoad);
+      if (existing) {
+        existing._panel.reveal(column);
+        return existing;
+      }
+      const emptyPanel = WorkflowEditorProvider._findEmptyPanel();
+      if (emptyPanel) {
+        emptyPanel._panel.reveal(column);
+        emptyPanel._pendingFile = fileToLoad;
+        if (emptyPanel._isWebviewReady) {
+          await emptyPanel.loadFile(fileToLoad);
+        }
+        return emptyPanel;
+      }
     }
 
-    // Otherwise, create a new panel
     const panel = vscode.window.createWebviewPanel(
       WorkflowEditorProvider.viewType,
-      'Workflow Editor',
+      fileToLoad ? path.basename(fileToLoad.fsPath) : 'Workflow Editor',
       column || vscode.ViewColumn.One,
       {
         enableScripts: true,
@@ -36,14 +53,29 @@ export class WorkflowEditorProvider {
         retainContextWhenHidden: true,
       }
     );
+    panel.iconPath = vscode.Uri.joinPath(extensionUri, 'images', 'icon.svg');
 
     const instance = new WorkflowEditorProvider(panel, extensionUri);
-    // Store file to load when webview is ready (backup in case explicit loadFile fails)
     if (fileToLoad) {
       instance._pendingFile = fileToLoad;
     }
-    WorkflowEditorProvider._instance = instance;
+    WorkflowEditorProvider._instances.add(instance);
     return instance;
+  }
+
+  private static _findByUri(uri: vscode.Uri): WorkflowEditorProvider | undefined {
+    const key = uri.toString();
+    for (const p of WorkflowEditorProvider._instances) {
+      const current = p.getCurrentFileUri();
+      if (current?.toString() === key) return p;
+    }
+    return undefined;
+  }
+
+  private static _findEmptyPanel(): WorkflowEditorProvider | undefined {
+    if (WorkflowEditorProvider._instances.size !== 1) return undefined;
+    const only = WorkflowEditorProvider._instances.values().next().value as WorkflowEditorProvider;
+    return only.getCurrentFileUri() === undefined ? only : undefined;
   }
 
   private constructor(panel: vscode.WebviewPanel, extensionUri: vscode.Uri) {
@@ -54,11 +86,13 @@ export class WorkflowEditorProvider {
     this._update();
 
     // Listen for when the panel is disposed
-    // This happens when the user closes the panel or when the panel is closed programmatically
     this._panel.onDidDispose(() => this.dispose(), null, this._disposables);
 
-    // Set context key for keybinding (Ctrl+S when workflow editor is focused)
+    // Track active panel for Save/Undo and set context key for keybinding
     const updateFocusContext = () => {
+      if (this._panel.active) {
+        WorkflowEditorProvider._activeInstance = this;
+      }
       vscode.commands.executeCommand('setContext', 'workflowEditorFocus', this._panel.active);
     };
     updateFocusContext();
@@ -107,7 +141,11 @@ export class WorkflowEditorProvider {
   private _currentFileUri: vscode.Uri | undefined;
 
   public static getInstance(): WorkflowEditorProvider | undefined {
-    return WorkflowEditorProvider._instance;
+    return WorkflowEditorProvider._activeInstance;
+  }
+
+  public getCurrentFileUri(): vscode.Uri | undefined {
+    return this._currentFileUri;
   }
 
   public requestSave(): void {
@@ -120,6 +158,7 @@ export class WorkflowEditorProvider {
 
   public async loadFile(uri: vscode.Uri) {
     this._currentFileUri = uri;
+    this._panel.title = path.basename(uri.fsPath);
     try {
       const document = await vscode.workspace.openTextDocument(uri);
       const content = document.getText();
@@ -215,11 +254,6 @@ export class WorkflowEditorProvider {
       vscode.Uri.joinPath(this._extensionUri, 'media', 'main.css')
     );
 
-    // Get the icon URI
-    const iconUri = webview.asWebviewUri(
-      vscode.Uri.joinPath(this._extensionUri, 'images', 'icon.svg')
-    );
-
     // Use a nonce to only allow a specific script to be run.
     const nonce = getNonce();
 
@@ -238,7 +272,6 @@ export class WorkflowEditorProvider {
 					try {
 						const vscode = acquireVsCodeApi();
 						window.vscode = vscode;
-						window.workflowEditorIconUri = "${iconUri.toString()}";
 					} catch (error) {
 						console.error('Failed to acquire VSCode API:', error);
 					}
@@ -249,10 +282,12 @@ export class WorkflowEditorProvider {
   }
 
   public dispose() {
-    vscode.commands.executeCommand('setContext', 'workflowEditorFocus', false);
-    WorkflowEditorProvider._instance = undefined;
+    WorkflowEditorProvider._instances.delete(this);
+    if (WorkflowEditorProvider._activeInstance === this) {
+      WorkflowEditorProvider._activeInstance = undefined;
+      vscode.commands.executeCommand('setContext', 'workflowEditorFocus', false);
+    }
 
-    // Clean up our resources
     this._panel.dispose();
 
     while (this._disposables.length) {
