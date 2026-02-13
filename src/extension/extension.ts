@@ -27,9 +27,38 @@ export function activate(context: vscode.ExtensionContext) {
   // Register context menu command for .yml/.yaml files
   const openWithEditorCommand = vscode.commands.registerCommand(
     'workflow-visual-editor.openWithEditor',
-    async (uri: vscode.Uri) => {
-      // Create or show provider with file to load - will be loaded when webview is ready
-      WorkflowEditorProvider.createOrShow(context.extensionUri, uri);
+    async (uri?: vscode.Uri) => {
+      // If invoked from context menu, uri will be provided
+      if (uri) {
+        WorkflowEditorProvider.createOrShow(context.extensionUri, uri);
+        return;
+      }
+
+      // If invoked from command palette, check active editor or show file picker
+      const activeEditor = vscode.window.activeTextEditor;
+      if (activeEditor) {
+        const document = activeEditor.document;
+        if (document.languageId === 'yaml' || document.fileName.endsWith('.yml') || document.fileName.endsWith('.yaml')) {
+          // Load the active editor's file
+          WorkflowEditorProvider.createOrShow(context.extensionUri, document.uri);
+          return;
+        }
+      }
+
+      // No active YAML file, show file picker
+      const fileUri = await vscode.window.showOpenDialog({
+        canSelectFiles: true,
+        canSelectFolders: false,
+        canSelectMany: false,
+        filters: {
+          'YAML Files': ['yml', 'yaml'],
+        },
+      });
+
+      if (fileUri && fileUri[0]) {
+        const provider = WorkflowEditorProvider.createOrShow(context.extensionUri);
+        await provider.loadFile(fileUri[0]);
+      }
     }
   );
 
