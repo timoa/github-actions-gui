@@ -1,3 +1,10 @@
+## [1.2.23](https://github.com/timoa/workflow-editor/compare/v1.2.22...v1.2.23) (2026-02-13)
+
+
+### Bug Fixes
+
+* **extension:** add support to edit multiple files ([52f8342](https://github.com/timoa/workflow-editor/commit/52f83421a2d13653556cd6c8b43d424832c49fc4))
+
 ## [1.2.22](https://github.com/timoa/workflow-editor/compare/v1.2.21...v1.2.22) (2026-02-13)
 
 
