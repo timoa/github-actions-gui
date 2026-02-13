@@ -23,6 +23,7 @@ A VSCode extension providing a visual editor for GitHub Actions workflow files. 
 - **Run script editor**: Edit step run scripts in a full-size popup dialog with a comfortable code-style editor (same font and theme as the app). Click "Edit script" next to a step’s run field to open the dialog; save with **Save changes** or **Ctrl/Cmd+S**, cancel with **Escape**.
 - **Workflow validation**: Automatic validation using the official [@actions/workflow-parser](https://github.com/actions/languageservices) (same as the GitHub Actions VS Code extension). Reports schema and syntax errors with detailed messages.
 - **VSCode Integration**: Open workflow files via context menu or command palette; save directly to workspace. Theme automatically follows your IDE theme (no in-editor theme toggle).
+- **Multiple workflow tabs**: Opening another workflow (e.g. from the Explorer or "Open Workflow File") opens in a new editor tab instead of replacing the current one, so unsaved changes are not lost. Re-opening the same file reveals its existing tab.
 - **Simplified navbar**: Toolbar keeps Save, View source, Clear/Load sample, Add Trigger/Job, and workflow config; Open file, Paste YAML, and theme buttons were removed for a cleaner UX.
 - **Validation**: Parse errors and lint errors shown in a banner when opening or editing workflows.
 
@@ -61,8 +62,8 @@ A VSCode extension providing a visual editor for GitHub Actions workflow files. 
 
 ### File Operations
 
-- **Open**: Use the Command Palette ("Workflow Editor: Open Workflow File") or right-click a `.yml`/`.yaml` file in the Explorer and choose "Open with Workflow Editor"
-- **Save**: Click the save icon in the toolbar or press Ctrl/Cmd+S when the workflow editor is focused
+- **Open**: Use the Command Palette ("Workflow Editor: Open Workflow File") or right-click a `.yml`/`.yaml` file in the Explorer and choose "Open with Workflow Editor". Each workflow opens in its own tab; opening the same file again focuses that tab.
+- **Save**: Click the save icon in the toolbar or press Ctrl/Cmd+S when the workflow editor tab is focused (Save/Undo apply to the active tab).
 - **View Source**: Click the code icon to view/edit raw YAML
 
 ## Contribute

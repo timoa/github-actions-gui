@@ -3,8 +3,8 @@ import { WorkflowEditorProvider } from './webview';
 
 export function activate(context: vscode.ExtensionContext) {
   // Register command to open workflow editor
-  const openCommand = vscode.commands.registerCommand('workflow-visual-editor.open', () => {
-    WorkflowEditorProvider.createOrShow(context.extensionUri);
+  const openCommand = vscode.commands.registerCommand('workflow-visual-editor.open', async () => {
+    await WorkflowEditorProvider.createOrShow(context.extensionUri);
   });
 
   // Register command to open file picker and load workflow
@@ -19,7 +19,7 @@ export function activate(context: vscode.ExtensionContext) {
     });
 
     if (fileUri && fileUri[0]) {
-      const provider = WorkflowEditorProvider.createOrShow(context.extensionUri);
+      const provider = await WorkflowEditorProvider.createOrShow(context.extensionUri, fileUri[0]);
       await provider.loadFile(fileUri[0]);
     }
   });
@@ -41,10 +41,9 @@ export function activate(context: vscode.ExtensionContext) {
         }
       }
 
-      // If we have a file to load, open editor and load it
+      // If we have a file to load, open editor and load it (new tab or reveal existing tab for that file)
       if (fileToLoad) {
-        const provider = WorkflowEditorProvider.createOrShow(context.extensionUri, fileToLoad);
-        // Always explicitly load the file to ensure it loads even if panel already existed
+        const provider = await WorkflowEditorProvider.createOrShow(context.extensionUri, fileToLoad);
         await provider.loadFile(fileToLoad);
         return;
       }
@@ -57,7 +56,7 @@ export function activate(context: vscode.ExtensionContext) {
         filters: { 'YAML Files': ['yml', 'yaml'] },
       });
       if (fileUri?.[0]) {
-        const provider = WorkflowEditorProvider.createOrShow(context.extensionUri);
+        const provider = await WorkflowEditorProvider.createOrShow(context.extensionUri, fileUri[0]);
         await provider.loadFile(fileUri[0]);
       }
     }

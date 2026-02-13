@@ -9,7 +9,6 @@ export interface VscodeApi {
 declare global {
   interface Window {
     vscode?: VscodeApi
-    workflowEditorIconUri?: string
   }
 }
 
