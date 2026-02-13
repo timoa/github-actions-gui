@@ -15,12 +15,10 @@ export class WorkflowEditorProvider {
       ? vscode.window.activeTextEditor.viewColumn
       : undefined;
 
-    // If we already have a panel, show it and load the file if provided
+    // If we already have a panel, show it
+    // Note: Caller should call loadFile() explicitly to load the file
     if (WorkflowEditorProvider._instance) {
       WorkflowEditorProvider._instance._panel.reveal(column);
-      if (fileToLoad) {
-        WorkflowEditorProvider._instance.loadFile(fileToLoad);
-      }
       return WorkflowEditorProvider._instance;
     }
 
@@ -40,6 +38,7 @@ export class WorkflowEditorProvider {
     );
 
     const instance = new WorkflowEditorProvider(panel, extensionUri);
+    // Store file to load when webview is ready (backup in case explicit loadFile fails)
     if (fileToLoad) {
       instance._pendingFile = fileToLoad;
     }
