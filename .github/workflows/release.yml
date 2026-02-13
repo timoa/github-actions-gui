@@ -83,6 +83,13 @@ jobs:
           fetch-depth: 0
           persist-credentials: true
 
+      - name: Generate GitHub App token
+        id: app-token
+        uses: actions/create-github-app-token@v2
+        with:
+          app-id: ${{ vars.TIMOA_BOT_APP_ID }}
+          private-key: ${{ secrets.TIMOA_BOT_PRIVATE_KEY }}
+
       - name: Release
         id: semantic-release
         uses: cycjimmy/semantic-release-action@v4
@@ -94,7 +101,8 @@ jobs:
             @semantic-release/npm@13
             @semantic-release/github@9
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GH_TOKEN: ${{ steps.app-token.outputs.token }}
+          GITHUB_TOKEN: ${{ steps.app-token.outputs.token }}
 
   publish:
     name: Publish
