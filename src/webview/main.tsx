@@ -2,11 +2,6 @@ import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
 import './index.css'
 import App from './App'
-import { getVscode } from './lib/fileHandling'
-
-// Get vscode API from window (set by script in HTML)
-const vscode = getVscode()
-
 // Set up message listener for VSCode
 window.addEventListener('message', (event) => {
   const message = event.data
@@ -44,14 +39,7 @@ window.addEventListener('message', (event) => {
   }
 })
 
-// Notify extension that webview is ready
-if (vscode && vscode.postMessage) {
-  vscode.postMessage({ command: 'ready' })
-} else {
-  console.error('VSCode API not available')
-}
-
-// Render React app
+// Render React app; App will send 'ready' to the extension after registering the loadFile listener
 const rootElement = document.getElementById('root')
 if (!rootElement) {
   console.error('Root element not found')

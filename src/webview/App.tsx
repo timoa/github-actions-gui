@@ -98,6 +98,8 @@ function AppInner() {
     }
   }, [])
 
+  const hasNotifiedReadyRef = useRef(false)
+
   // Listen for file load events from VSCode
   useEffect(() => {
     const handleLoadFile = (event: CustomEvent<{ content: string; filename: string }>) => {
@@ -120,6 +122,10 @@ function AppInner() {
     }
 
     window.addEventListener('vscode-loadFile', handleLoadFile as EventListener)
+    if (!hasNotifiedReadyRef.current) {
+      hasNotifiedReadyRef.current = true
+      getVscode()?.postMessage?.({ command: 'ready' })
+    }
     return () => {
       window.removeEventListener('vscode-loadFile', handleLoadFile as EventListener)
     }
