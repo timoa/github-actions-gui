@@ -1,3 +1,20 @@
+## [1.2.23](https://github.com/timoa/workflow-editor/compare/v1.2.22...v1.2.23) (2026-02-13)
+
+
+### Bug Fixes
+
+* **extension:** add support to edit multiple files ([52f8342](https://github.com/timoa/workflow-editor/commit/52f83421a2d13653556cd6c8b43d424832c49fc4))
+
+## [1.2.22](https://github.com/timoa/workflow-editor/compare/v1.2.21...v1.2.22) (2026-02-13)
+
+
+### Bug Fixes
+
+* **cicd:** add another fix for the release workflow ([13fc8ab](https://github.com/timoa/workflow-editor/commit/13fc8ab3cbb7c386907d410507e6e9702bd6c51d))
+* **cicd:** fix release workflow ([07e2f3a](https://github.com/timoa/workflow-editor/commit/07e2f3aa9e9d4e07fce644b2bf6b433d6b83f662))
+* **commands:** fix another issue with the command palette execution [#23](https://github.com/timoa/workflow-editor/issues/23) ([a3b54cc](https://github.com/timoa/workflow-editor/commit/a3b54cceb05d59260993d04d6ec7926cf0030a09))
+* **commands:** fix the command "Open with Workflow Editor" [#23](https://github.com/timoa/workflow-editor/issues/23) ([96b7143](https://github.com/timoa/workflow-editor/commit/96b7143ad2556665f79cac509a4a9aada8dab692))
+
 ## [1.2.21](https://github.com/timoa/workflow-editor/compare/v1.2.20...v1.2.21) (2026-02-11)
 
 

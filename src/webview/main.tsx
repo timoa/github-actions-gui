@@ -22,14 +22,6 @@ window.addEventListener('message', (event) => {
         })
       )
       break
-    case 'iconUri':
-      // Dispatch icon URI event
-      window.dispatchEvent(
-        new CustomEvent('vscode-iconUri', {
-          detail: { uri: message.uri },
-        })
-      )
-      break
     case 'saveRequest':
       window.dispatchEvent(new CustomEvent('vscode-saveRequest'))
       break
