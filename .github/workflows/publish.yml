@@ -23,15 +23,16 @@ jobs:
       contents: write
     steps:
       - name: Harden Runner
-        uses: step-security/harden-runner@v2
+        uses: step-security/harden-runner@95d9a5deda9de15063e7595e9719c11c38c90ae2 # v2.13.2
         with:
-          egress-policy: audit
-          # allowed-endpoints: >
-          #   github.com:443
-          #   release-assets.githubusercontent.com:443
-          #   registry.npmjs.org:443
-          #   marketplace.visualstudio.com:443
-          #   open-vsx.org:443
+          egress-policy: block
+          allowed-endpoints: >
+            api.github.com:443
+            github.com:443
+            marketplace.visualstudio.com:443
+            open-vsx.org:443
+            registry.npmjs.org:443
+            release-assets.githubusercontent.com:443
 
       - name: Checkout with specific ref
         uses: actions/checkout@v6
